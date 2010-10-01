@@ -1,0 +1,8 @@
+REGEDIT4
+
+;Contributor:   Yoya (yoya@awm.jp)
+;Updated:       31 March 2009
+;Subject:       Registry file to disable file transfer in Skype 3 & 4
+
+[HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone]
+"DisableFileTransfer"=dword:00000001
