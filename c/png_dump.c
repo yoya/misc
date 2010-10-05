@@ -152,7 +152,7 @@ int main(int argc, char **argv) {
         for (i = 0 ; i < palette_num ; i+=palette_dump_unit ) {
             printf("[%03d]", i);
             for (j = 0 ; (j < palette_dump_unit) && ((i+j) < palette_num) ; j++) {
-                if (i <= num_trans) {
+                if ((i+j) < num_trans) {
                     printf(" #%02x%02x%02x(%02x)",
                            palette[i+j].red,
                            palette[i+j].green,
