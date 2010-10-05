@@ -61,6 +61,10 @@ class YSwf {
      * input swf data
      */
     function input($data) {
+        if (substr($data, 0, 3) === 'CWS') { // XXX
+            $head8byte = substr($data, 0, 8);
+            $data = $head8byte.gzuncompress(substr($data, 8));
+        }
         $this->_bio = new BitIO();
         $this->_bio->input($data);
         // header
@@ -73,7 +77,6 @@ class YSwf {
         $this->_header_info = array('length' => $ret);
         // movie
         $offset = $ret;
-        
         $ret = $this->_input_movie($data, $offset, strlen($data) - $offset, $this->_movie_info_list);
         return $ret;
     }
@@ -112,13 +115,13 @@ class YSwf {
     function _validate_header($data) {
         // validate
         $magic = $this->_bio->getData(3, 0);
-        if ($magic != 'FWS') {
-            trigger_error("no FWS($magic)");
+        if (($magic != 'FWS') && ($magic != 'CWS')) {
+            trigger_error("no FWS,CWS($magic)");
             return false;
         }
         $version = $this->_bio->getUI8(3);
-        if ($version > 4) {
-            trigger_error("version($version) must be le 4");
+        if ($version > 10) {
+            trigger_error("version($version) must be le 10");
             return false;
         }
         $file_length = $this->_bio->getUI32LE(4);
