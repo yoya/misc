@@ -126,6 +126,8 @@ int main(int argc, char **argv) {
           if (png_get_tRNS(png_ptr, png_info_ptr, &trans, &num_trans,
                            &trans_values)) {
               png_get_bKGD(png_ptr, png_info_ptr, &trans_values);
+          } else {
+              num_trans = 0;
           }
           printf("  num_trans=%d\n", num_trans);
           break;
