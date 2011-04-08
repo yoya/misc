@@ -51,17 +51,19 @@ int gif_data_read_func(GifFileType* GifFile, GifByteType* buf, int count) {
 int gif_data_write_func(GifFileType* GifFile, const GifByteType* buf, int count) {
     my_gif_buffer *gif_buff = (my_gif_buffer *) GifFile->UserData;
     unsigned long new_data_len;
+    unsigned char *tmp;
     if (gif_buff->data_offset + count > gif_buff->data_len) {
         new_data_len = 2 * gif_buff->data_len;
         if (gif_buff->data_offset + count > new_data_len) {
             new_data_len = gif_buff->data_offset + count;
         }
-        gif_buff->data = realloc(gif_buff->data, new_data_len);
-        if (gif_buff->data == NULL) {
+        tmp = realloc(gif_buff->data, new_data_len);
+        if (tmp == NULL) {
             fprintf(stderr, "gif_data_write_func: can't realloc: new_data_len(%lu), data_len(%lu)\n",
                     new_data_len, gif_buff->data_len);
             return 0;
         }
+        gif_buff->data = tmp;
         gif_buff->data_len = new_data_len;
     }
     memcpy(gif_buff->data + gif_buff->data_offset, buf, count);
