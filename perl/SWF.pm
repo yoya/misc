@@ -1,6 +1,6 @@
 package SWF;
 
-require 'BitIO.pm';
+# require 'BitIO.pm';
 use strict;
 use warnings;
 use BitIO;
@@ -87,3 +87,6 @@ sub dump {
         print "tag code:$tag_code($tagName) length:".$tag->{length}."\n";
     }
 }
+
+1;
+
