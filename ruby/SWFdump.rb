@@ -5,5 +5,6 @@ if ARGV.length != 1
   exit 1;
 end
 data = IO.read(ARGV[0])
-swf = SWF.new(data.force_encoding("BINARY"));
+data.force_encoding("BINARY") if RUBY_VERSION >= '1.9'
+swf = SWF.new(data);
 swf.dump()
