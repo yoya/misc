@@ -51,6 +51,25 @@ sub stringRectangle {
     return "Xmin:".($rect->{Xmin}/20)." Xmax:".($rect->{Xmax}/20)." Ymin:".($rect->{Ymin}/20)." Ymax:".($rect->{Ymax}/20);
 }
 
+
+sub getTagName {
+    my $tag_code = shift;
+    my %tagName = (
+        0 => 'End',
+        1 => 'ShowFrame',
+        2 => 'DefineShape',
+        6 => 'DefineBitsJPEG',
+        8 => 'JPEGTables',
+        9 => 'SetBackgroundColor',
+        12 => 'DoAction',
+        26 => 'PlaceObject2',
+        );
+    if (exists $tagName{$tag_code}) {
+        return $tagName{$tag_code};
+    }
+    return 'unknown';
+}
+
 sub dump {
     my ($self) = @_;
     # header
@@ -63,7 +82,8 @@ sub dump {
     print "frame_count: ".$self->{frame_count}."\n";
     # tag list
     foreach my $tag (@{$self->{tags}}) {
-        print "tag code=".$tag->{code}." length=".$tag->{length}."\n";
+        my $tag_code = $tag->{code};
+        my $tagName = getTagName($tag_code);
+        print "tag code:$tag_code($tagName) length:".$tag->{length}."\n";
     }
 }
-
