@@ -11,6 +11,7 @@ if (empty($_FILES['imagefile']['tmp_name']) && (empty($argv[1]))) {
      <input type="hidden" name="MAX_FILE_SIZE" value="1000000" />
       画像ファイル(GIF/PNG/JPEGをアップロード: <input name="imagefile" type="file" /><br />
      倍率: <input name="scale" value="8" type="text"/> <br />
+     マージン: <input name="margin" value="1" type="text"/> <br />
      <input type="submit" value="ファイルを送信" />
 
 <p> 小さい画像を入れてね (はーと) </p>
@@ -22,9 +23,11 @@ if (empty($_FILES['imagefile']['tmp_name']) && (empty($argv[1]))) {
 if (isset($_FILES['imagefile']['tmp_name'])) {
     $imagefile = $_FILES['imagefile']['tmp_name'];
     $scale = $_REQUEST['scale'];
+    $margin = $_REQUEST['margin'];
 } else {
     $imagefile = $argv[1];
     $scale = (int) $argv[2];
+    $margin = (int) $argv[3];
 }
 
 function getimagecoloralpha($im, $red, $green, $blue, $alpha) {
@@ -56,7 +59,7 @@ switch ($imageinfo[2]) {
 $width  = imagesx($im);
 $height = imagesy($im);
 
-$im2 = imagecreatetruecolor($scale*$width + 1, $scale*$height + 1);
+$im2 = imagecreatetruecolor($scale*$width + $margin, $scale*$height + $margin);
 
 for ($y = 0 ; $y < $height ; $y++) {
     for ($x = 0 ; $x < $width ; $x++) {
@@ -65,20 +68,23 @@ for ($y = 0 ; $y < $height ; $y++) {
 	$yy = $scale*$y;
 	$rgb = imagecolorsforindex($im, $color);
 	$color2 = getimagecoloralpha($im2, $rgb['red'], $rgb['green'], $rgb['blue'], $rgb['alpha']);
-	$xx = $scale*$x + 1;
-	$yy = $scale*$y + 1;
-	imagefilledrectangle($im2, $xx, $yy, $xx + $scale - 1, $yy + $scale - 1, $color2);
+	$xx = $scale*$x + $margin;
+	$yy = $scale*$y + $margin;
+	imagefilledrectangle($im2, $xx, $yy, $xx + $scale - $margin, $yy + $scale - $margin, $color2);
     }
 }
 
 $black = getimagecoloralpha($im2, 0, 0, 0, 0);
-for ($x = 0 ; $x <= $width ; $x++) {
-	$xx = $scale*$x;
-	imageline($im2, $xx, 0, $xx, $scale*$height, $black);
-}
-for ($y = 0 ; $y <= $height ; $y++) {
-	$yy = $scale*$y;
-	imageline($im2, 0, $yy, $scale*$width, $yy, $black);
+
+if ($margin > 0) {
+  for ($x = 0 ; $x <= $width ; $x++) {
+    $xx = $scale*$x;
+    imagefilledrectangle($im2, $xx, 0, $xx, $scale*$height + $margin - 1, $black);
+  }
+  for ($y = 0 ; $y <= $height ; $y++) {
+    $yy = $scale*$y;
+    imagefilledrectangle($im2, 0, $yy, $scale*$width + $margin - 1, $yy, $black);
+  }
 }
 
 header('Content-type: image/png');
