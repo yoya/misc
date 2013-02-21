@@ -16,7 +16,7 @@ function grepStatusCode($keywords) {
         echo "$keyword:".PHP_EOL;
         foreach (array(1, 3) as $type) {
             foreach ($codeMap[$type] as $idx => $code) {
-                if (strpos($code, $keyword) !== false) {
+                if (stripos($code, $keyword) !== false) {
                 echo "\t".$codeMap[1][$idx].": ".$codeMap[3][$idx].PHP_EOL;
                 }
             }
