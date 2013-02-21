@@ -5,7 +5,7 @@ if ($argc < 2) {
     exit (-1);
 }
 
-echo grepStatusCode(array_splice($argv, 1));
+grepStatusCode(array_splice($argv, 1));
 
 exit (0);
 
