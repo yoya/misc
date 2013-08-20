@@ -31,14 +31,14 @@ try {
  * get my account name
  */
 
-$query = $db->query('SELECT * FROM Accounts');
+$query = $db->query('SELECT skypename FROM Accounts');
 $rows = $query->fetchArray();
 $myname = $rows['skypename'];
 
 /*
  * get topics & partner name
  */
-$query = $db->query('SELECT * FROM Chats');
+$query = $db->query('SELECT timestamp,name,topic,activemembers,adder,friendlyname FROM Chats');
 
 $topicTable = array();
 $topicElapsedTimeTable = array();
@@ -105,7 +105,7 @@ file_put_contents("$save_dir/topicmap.txt", $data);
  * get all messages
  */
 
-$query = $db->query('SELECT * FROM Messages');
+$query = $db->query('SELECT timestamp,chatname,from_dispname,body_xml FROM Messages');
 
 for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
     $timestamp = $rows['timestamp'];
