@@ -76,6 +76,24 @@ for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
     }
 }
 
+/*
+ * get dispname
+ */
+$dispnameTable = array();
+$query = $db->query('SELECT author,from_dispname FROM Messages');
+
+for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
+    $author = $rows['author'];
+    $from_dispname  = $rows['from_dispname'];
+    if ($from_dispname) {
+        $dispnameTable[$author] = $from_dispname;
+    }
+}
+
+/*
+ * save topicmap
+ */
+
 $topicTablePeer = array();
 foreach ($topicTable as $name => $topic) {
     $topicTablePeer []= "$name:$topic";
@@ -89,14 +107,11 @@ file_put_contents("$save_dir/topicmap.txt", $data);
 
 $query = $db->query('SELECT * FROM Messages');
 
-$dispnameTable = array();
 for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
     $timestamp = $rows['timestamp'];
     $date = date('Y/m/d h:i:s', $timestamp);
     $chatname = $rows['chatname'];
-    $author = $rows['author'];
     $from_dispname  = $rows['from_dispname'];
-    $dispnameTable[$author] = $from_dispname;
     $body_xml = $rows['body_xml'];
     
     if (isset($topicTable[$chatname])) {
@@ -104,13 +119,17 @@ for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
     } else {
         if (isset($privateChatPartner[$chatname])) {
             $adder = $privateChatPartner[$chatname];
-            if (isset($dispnameTable[$adder])) {
-                $filename = $dispnameTable[$adder];
-            } else {
-                $filename = $privateChatPartner[$chatname];
+        } else {
+            $n = preg_match('/\#(.+)\/\$(.+);/', $chatname, $matches);
+            if ($n === 1) {
+                $adder = $matches[2];
             }
+        }
+        if (isset($dispnameTable[$adder])) {
+            $filename = $dispnameTable[$adder];
         } else {
             $filename = $from_dispname;
+//            echo "XXX: $chatname, $filename\n";
         }
     }
     $filename = trim($filename);
