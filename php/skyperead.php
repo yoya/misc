@@ -53,7 +53,26 @@ for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
     $activemembers  = $rows['activemembers'];
     $adder = $rows['adder'];
     $friendlyname  = $rows['friendlyname'];
-    if (count(explode(" ", $activemembers)) > 2) {
+    //
+    $activemembers_num = count(explode(" ", $activemembers));
+    if ($activemembers_num === 1) { // maybe mood message
+        $topicTable[$name] = $myname;
+    } else if (count(explode(" ", $activemembers)) ===2) { // private message
+         if ($adder !== $myname) {
+            if (is_null($adder)) {
+                $n = preg_match('/\#(.+)\/\$(.+);/', $name, $matches);
+                if ($n === 1) {
+                    $adder = $matches[2];
+                    if ($adder === $myname) { // XXX
+                        $adder = $matches[1];
+                    }
+                }
+            }
+            $privateChatPartner[$name] = $adder;
+         } else {
+             echo "adder === myname: $adder\n";
+         }
+    } else { // group message
         if (ctype_space($topic)) continue; // skip
         if (isset($topicTable[$name])) {
             $elapsed = $timestamp - $topicPrevTimeTable[$name];
@@ -69,19 +88,29 @@ for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
             $topicPrevTimeTable[$name] = $timestamp;
             $topicElapsedTimeTable[$name] = 0;
         }
-    } else {
-        if ($adder !== $myname) {
-            $privateChatPartner[$name] = $adder;
-        }
+    }
+}
+
+foreach ($topicTable as $name => $topic) {
+    if (is_null($topic) || ($topic === '')) { // empty topic
+        $topicTable[$name] = $name;
     }
 }
 
 /*
  * get dispname
  */
-$dispnameTable = array();
-$query = $db->query('SELECT author,from_dispname FROM Messages');
 
+$dispnameTable = array();
+
+$query = $db->query('SELECT skypename,displayname FROM  Contacts');
+for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
+    $skypename = $rows['skypename'];
+    $displayname = $rows['displayname'];
+    $dispnameTable[$skypename] = $displayname;
+}
+
+$query = $db->query('SELECT author,from_dispname FROM Messages');
 for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
     $author = $rows['author'];
     $from_dispname  = $rows['from_dispname'];
@@ -91,7 +120,7 @@ for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
 }
 
 /*
- * save topicmap
+ * save topicmap & usernamemap
  */
 
 $topicTablePeer = array();
@@ -100,6 +129,13 @@ foreach ($topicTable as $name => $topic) {
 }
 $data = implode(PHP_EOL, $topicTablePeer);
 file_put_contents("$save_dir/topicmap.txt", $data);
+
+$userTablePeer = array();
+foreach ($dispnameTable as $name => $disp) {
+    $userTablePeer []= "$name:$disp";
+}
+$data = implode(PHP_EOL, $userTablePeer);
+file_put_contents("$save_dir/usermap.txt", $data);
 
 /*
  * get all messages
@@ -114,22 +150,31 @@ for ($idx = 0; $rows = $query->fetchArray() ; $idx++) {
     $from_dispname  = $rows['from_dispname'];
     $body_xml = $rows['body_xml'];
     
-    if (isset($topicTable[$chatname])) {
+    if (is_null($chatname)) {
+        $filename = $from_dispname;
+    } elseif (isset($topicTable[$chatname])) {
         $filename = $topicTable[$chatname];
     } else {
+        $adder = null;
         if (isset($privateChatPartner[$chatname])) {
             $adder = $privateChatPartner[$chatname];
         } else {
             $n = preg_match('/\#(.+)\/\$(.+);/', $chatname, $matches);
             if ($n === 1) {
                 $adder = $matches[2];
+                if ($adder === '*2') { // mood message ?
+                    $adder = $matches[1];
+                }
             }
         }
         if (isset($dispnameTable[$adder])) {
             $filename = $dispnameTable[$adder];
-        } else {
+        } elseif (is_null($adder)) { // Illegal Route
             $filename = $from_dispname;
-//            echo "XXX: $chatname, $filename\n";
+            echo "adder is null: $chatname, $filename\n";
+        } else {
+            $filename = $adder;
+//            echo "no dispnameTable[$adder]: $chatname, $filename\n";
         }
     }
     $filename = trim($filename);
