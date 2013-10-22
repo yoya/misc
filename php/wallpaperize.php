@@ -1,8 +1,12 @@
 <?php
 
+$bgcolor = "black";
+// $bgcolor = "white";
+
 if (php_sapi_name() === 'cli') {
     if ($argc !== 3) {
         echo "Usage: php wallpaperize.php <src_dir> <dest_dir>".PHP_EOL;
+        echo "Usage: php wallpaperize.php <src_file> <dest_file>".PHP_EOL;
         exit (1);
     }
     list($prog, $srcDir, $destDir) = $argv;
@@ -13,11 +17,15 @@ if (php_sapi_name() === 'cli') {
     }
     
     $files = array();
-    foreach (scandir($srcDir) as $file) {
-        $path = $srcDir."/".$file;
-        if (is_file($path) && ($file[0] !== '.')) {
-            $files []= $file;
+    if (is_dir($srcDir)) {
+        foreach (scandir($srcDir) as $file) {
+            $path = $srcDir."/".$file;
+            if (is_file($path) && ($file[0] !== '.')) {
+                $files []= $file;
+            }
         }
+    } else {
+        $files []= $srcDir; // not dir, but file.
     }
     
     if (count($files) === 0) {
@@ -25,13 +33,19 @@ if (php_sapi_name() === 'cli') {
         exit (1);
     }
     
-    if (! file_exists($destDir)) {
+     if (is_dir($srcDir) && (! file_exists($destDir))) {
         mkdir($destDir);
     }
     
     foreach ($files as $file) {
-        $srcPath = $srcDir."/".$file;
-        $destPath = $destDir."/".$file;
+
+        if (is_dir($srcDir)) {
+            $destPath = $destDir."/".$file;
+            $srcPath = $srcDir."/".$file;
+        } else {
+            $srcPath = $srcDir; // not dir, but file.
+            $destPath = $destDir; // not dir, but file.
+        }
         $imgData = file_get_contents($srcPath);
         $type = detectType($imgData);
         if ($type === false) { continue; } // skip unknown format
@@ -107,9 +121,14 @@ function detectType($imgData) {
 }
 
 function  filterValue(&$value, $total, $maxvalue) {
-    $ratio = $value / 255;
-    $value = ($value * $ratio) + ($value * 127 / $maxvalue) * (1-$ratio);
-    $value = ($value * 3 + $total) / 12;
+    global $bgcolor;
+    if ($bgcolor === "white") {
+        $value = (255 * 6+ $value) / 7;
+    } else { // black, maybe
+        $ratio = $value / 255;
+        $value = ($value * $ratio) + ($value * 127 / $maxvalue) * (1-$ratio);
+        $value = ($value * 3 + $total) / 12;
+    }
 }
 
 function  filterPixel(&$red, &$green, &$blue, $maxvalue) {
