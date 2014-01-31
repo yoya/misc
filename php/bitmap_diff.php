@@ -9,7 +9,7 @@ function usage() {
     echo "Usage: php bitmap_diff.php <file1> <file2> <file3>\n";
   }
 
-if (($argc != 4) || (! is_readable($argv[1])) || (! is_readable($argv[2]))) {
+if ($argc != 4) {
     usage();
     exit (1);
 }
@@ -29,7 +29,16 @@ $widths = array();
 $heights = array();
 
 foreach ($files as $file) {
-    $data = file_get_contents($file);
+    if (strncmp($file, 's3://', 5) === 0) {
+        require_once('S3_GetFile.php');
+        $data = S3_GetFile($file);
+    } else {
+        $data = file_get_contents($file);
+        if ($data === false) {
+            echo "Error: Can't open file($file)\n";
+            exit (1);
+        }
+    }
     $im = imagecreatefromstring($data);
     if ($im === false) {
         echo "Error: image($file) has broken.\n";
