@@ -6,8 +6,8 @@
    */
 
 function usage() {
-    echo "Usage: php bitmap_diff.php <file1> <file2> <pngfile>\n";
-}
+    echo "Usage: php bitmap_diff.php <file1> <file2> <file3>\n";
+  }
 
 if (($argc != 4) || (! is_readable($argv[1])) || (! is_readable($argv[2]))) {
     usage();
@@ -17,31 +17,40 @@ if (($argc != 4) || (! is_readable($argv[1])) || (! is_readable($argv[2]))) {
 $output_file = $argv[3];
 
 if (is_readable($output_file)) {
-    echo "ERROR: $output_file is exist.".PHP_EOL;
+    echo "Error: $output_file is exist.\n";
     usage();
     exit (1);
 }
 
-$data1 = file_get_contents($argv[1]);
-$data2 = file_get_contents($argv[2]);
-$im1 = imagecreatefromstring($data1);
-$im2 = imagecreatefromstring($data2);
+$files = array_slice($argv, 1, 2);
 
-if (($im1 === false) || ($im2 === false)) {
-    echo "Error: image1 or image2 has broken.";
-    exit (1);
+$images = array();
+$widths = array();
+$heights = array();
+
+foreach ($files as $file) {
+    $data = file_get_contents($file);
+    $im = imagecreatefromstring($data);
+    if ($im === false) {
+        echo "Error: image($file) has broken.\n";
+        exit (1);
+    }
+    $images []= $im;
+    $widths  []= imagesx($im);
+    $heights []= imagesy($im);
 }
 
-$width1  = imagesx($im1); $height1 = imagesy($im1);
-$width2  = imagesx($im2); $height2 = imagesy($im2);
+list($im1,$im2) = $images;
+list($width1, $width2)   = $widths;
+list($height1, $height2) = $heights;
 
 if (($width1 != $width2) || ($height1 != $height2)) {
     echo "Error: image1(".$width1."x".$height1.") image2(".$width2."x".$height2.")\n";
     exit (1);
 }
 
-$width = $width1;
-$height = $height1;
+$width  = min($widths);
+$height = min($heights);
 
 $im3 = imagecreatetruecolor($width, $height);
 
