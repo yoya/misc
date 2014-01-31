@@ -7,11 +7,9 @@ $width = $height = PHP_INT_MAX;
 
 foreach ($files as $file) {
     if (strncmp($file, 's3://', 5) === 0) {
-        require_once('S3_GetFile.php');
-        $data = S3_GetFile($file);
-    } else {
-        $data = file_get_contents($file);
+        require_once('S3_Wrapper.php');
     }
+    $data = file_get_contents($file);
     $im = imagecreatefromstring($data);
     $width  = min($width,  imagesx($im));
     $height = min($height, imagesy($im));

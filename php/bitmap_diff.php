@@ -30,14 +30,12 @@ $heights = array();
 
 foreach ($files as $file) {
     if (strncmp($file, 's3://', 5) === 0) {
-        require_once('S3_GetFile.php');
-        $data = S3_GetFile($file);
-    } else {
-        $data = file_get_contents($file);
-        if ($data === false) {
-            echo "Error: Can't open file($file)\n";
-            exit (1);
-        }
+        require_once('S3_Wapper.php');
+    }
+    $data = file_get_contents($file);
+    if ($data === false) {
+        echo "Error: Can't open file($file)\n";
+        exit (1);
     }
     $im = imagecreatefromstring($data);
     if ($im === false) {
