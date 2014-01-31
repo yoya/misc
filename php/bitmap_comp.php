@@ -1,18 +1,23 @@
 <?php
 
-$data1 = file_get_contents($argv[1]);
-$data2 = file_get_contents($argv[2]);
-$im1 = imagecreatefromstring($data1);
-$im2 = imagecreatefromstring($data2);
+$files = array_slice($argv, 1);
 
-$width1  = imagesx($im1);
-$height1 = imagesy($im1);
+$images = array();
+$width = $height = PHP_INT_MAX;
 
-$width2  = imagesx($im2);
-$height2 = imagesy($im2);
-
-$width  = min($width1, $width2);
-$height  = min($height1, $height2);
+foreach ($files as $file) {
+    if (strncmp($file, 's3://', 4) === 0) {
+        require_once('S3_GetFile.php');
+        $data = S3_GetFile($file);
+    } else {
+        $data = file_get_contents($file);
+    }
+    $im = imagecreatefromstring($data);
+    $width  = min($width,  imagesx($im));
+    $height = min($height, imagesy($im));
+    $images []= $im;
+}
+list($im1, $im2) = $images;
 
 $distance_sqrt_sum = 0;
 
