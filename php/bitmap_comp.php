@@ -6,7 +6,7 @@ $images = array();
 $width = $height = PHP_INT_MAX;
 
 foreach ($files as $file) {
-    if (strncmp($file, 's3://', 4) === 0) {
+    if (strncmp($file, 's3://', 5) === 0) {
         require_once('S3_GetFile.php');
         $data = S3_GetFile($file);
     } else {
