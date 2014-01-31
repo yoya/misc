@@ -19,7 +19,7 @@ foreach ($files as $file) {
 }
 list($im1, $im2) = $images;
 
-$distance_sq_sum = 0;
+$distance_sum = 0;
 
 for ($y = 0 ; $y < $height ; $y++) {
     for ($x = 0 ; $x < $width ; $x++) {
@@ -30,8 +30,8 @@ for ($y = 0 ; $y < $height ; $y++) {
         $red_diff   = $rgba1['red']   - $rgba2['red'];
         $green_diff = $rgba1['green'] - $rgba2['green'];
         $blue_diff  = $rgba1['blue']  - $rgba2['blue'];
-        $distance_sq_sum += $red_diff*$red_diff + $green_diff*$green_diff + $blue_diff*$blue_diff;
+        $distance_sum += sqrt($red_diff*$red_diff + $green_diff*$green_diff + $blue_diff*$blue_diff);
     }
 }
 
-echo sqrt($distance_sq_sum) / $width / $height . "\n";
+echo $distance_sum / $width / $height . "\n";
