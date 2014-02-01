@@ -1,5 +1,20 @@
 <?php
 
+  /*
+   * bitmap compare each pixels.
+   * 2011/10/13- yoya@awm.jp
+   */
+
+function usage() {
+    echo "Usage: php bitmap_comp.php <file1> <file2>\n";
+}
+
+if ($argc != 3) {
+    usage();
+    exit (1);
+}
+
+
 $files = array_slice($argv, 1);
 
 $images = array();
@@ -10,6 +25,10 @@ foreach ($files as $file) {
         require_once('S3_Wrapper.php');
     }
     $data = file_get_contents($file);
+    if ($data === false) {
+        echo "Error: Can't open file($file)\n";
+        exit (1);
+    }
     $im = imagecreatefromstring($data);
     $width  = min($width,  imagesx($im));
     $height = min($height, imagesy($im));
