@@ -3,7 +3,6 @@
 
 int main(void) {
     int num, n, f;
-
     for (num = 2 ; num < 150 ; num++) {
         printf ("%d:", num);
         n = num;
@@ -13,10 +12,10 @@ int main(void) {
                 n /= f;
             }
         }
-    if (n > 1) {
-        printf (" %d", n);
+        if (n > 1) {
+            printf (" %d", n);
+        }
+        printf("\n");
     }
-    printf("\n");
-  }
-  return 0;
+    return 0;
 }
