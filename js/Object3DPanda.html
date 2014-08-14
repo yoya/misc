@@ -31,6 +31,7 @@ var face = null;
 function threeStart() {
 	initThree();  //Three.js初期化関数の実行
 	initObject(); //オブジェクト初期化関数の実行
+	initLight();  //ライト初期化関数の実行
 	initCamera(); //カメラ初期化関数の実行
 	loop();       //無限ループ関数の実行
 }
@@ -57,6 +58,18 @@ function initThree() {
 		//シーンオブジェクトの生成
 	scene = new THREE.Scene();
 }
+////////////////////////////////////////////////////////////////////
+// ライト初期化関数の定義
+////////////////////////////////////////////////////////////////////
+function initLight() {
+        //平行光源オブジェクトの生成
+        var directionalLight = new THREE.DirectionalLight(0xffffff, 1.0, 0);
+        //平行光源オブジェクトの位置の設定
+        directionalLight.position.set(0, 0, 1);
+        //平行光源オブジェクトのシーンへの追加
+        scene.add(directionalLight);
+}
+
 ////////////////////////////////////////////////////////////////////
 // カメラ初期化関数の定義
 ////////////////////////////////////////////////////////////////////
