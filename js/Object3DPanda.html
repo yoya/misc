@@ -113,8 +113,12 @@ function initObject() {
 //パンダを1体作る
 function makePanda() {
 	var object_tree_params = [
+	    { name:"test", type:"polygon", posi:[0,0,0],
+              edges:[[0,  100],
+                     [-100,  -100], [100, -100]],
+              color:"red"},
 	    { name:"body", type:"circle", posi:[0,0,0], size:25,
-	      color:material_white },
+	      color:'white' },
 	    { name:"headGroup",
 	      group:[
 	        { name:"rightEar", type:"circle", posi:[15,46, 5], size:10,

@@ -17,7 +17,26 @@ Object3DMaker.prototype = {
 		object_tree_child[param.name].child = {};
 	        var obj = this._make(param.group, object_tree_child[param.name]);
 	     } else {
-	        var geometry = new THREE.SphereGeometry(param.size, 24, 24);
+		switch (param.type) {
+		case 'circle':
+		    var geometry = new THREE.SphereGeometry(param.size, 24, 24);
+		    break;
+		case 'polygon':
+		    var shape = new THREE.Shape();
+		    shape.moveTo(param.edges[0][0], param.edges[0][1], 0);
+		    for (var j = 1 ; j < param.edges.length ; j++) {
+			shape.lineTo(param.edges[j][0], param.edges[j][1], 0);
+		    }
+		    var extrudeSettings = { amount: 0,  bevelSegments: 0 };
+		    var centerStreet3d = shape.extrude( extrudeSettings );
+		    var centerStreetPoints = shape.createPointsGeometry();
+		    var centerStreetSpacedPoints = shape.createSpacedPointsGeometry();
+		    geometry = centerStreet3d;
+		    break;
+		default:
+		    console.error("Unknown type:"+param.type);
+		    break;
+		}
 	        var map = null;
 	        var material = param.material;
 	        if ("texture" in param) {
@@ -33,7 +52,13 @@ Object3DMaker.prototype = {
 		  material = new THREE.MeshFaceMaterial([material_basic]);
 		}
 	        //立方体オブジェクトの生成
-	        var obj = new THREE.Mesh(geometry, material);
+		var obj;
+		if (param.type === 'polygon') {
+		    console.log(param.color);
+		    obj = THREE.SceneUtils.createMultiMaterialObject(geometry, [ new THREE.MeshLambertMaterial( { color: param.color, map: map } ), new THREE.MeshBasicMaterial( { color: 0x00FF00, wireframe: false, transparent: false } ) ] );
+		} else {
+		    obj = new THREE.Mesh(geometry, material);
+		}
 		var posi = param.posi;
 	        obj.position.set( posi[0], posi[1], posi[2]);
 	        // 立方体オブジェクトのシーンへの追加
