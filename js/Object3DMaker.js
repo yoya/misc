@@ -22,7 +22,7 @@ Object3DMaker.prototype = {
 		    var geometry = new THREE.SphereGeometry(param.width, param.height);
 		    break;
 		case 'plane':
-		    var geometry = new THREE.PlaneGeometry(param.size, 24, 24);
+		    var geometry = new THREE.PlaneGeometry(param.width, param.height);
 		    break;
 		case 'polygon':
 		    var shape = new THREE.Shape();
