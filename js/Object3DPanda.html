@@ -112,40 +112,28 @@ function initObject() {
 
 //パンダを1体作る
 function makePanda() {
-
-	//黒と白のマテリアルを作成
-	var materials_white = [];
-	materials_white[0] = new THREE.MeshBasicMaterial({color:0xffffff});
-	//材質オブジェクトの宣言と生成
-	var material_white = new THREE.MeshFaceMaterial(materials_white);
-
-	var materials_black = [];
-	materials_black[0] = new THREE.MeshBasicMaterial({color:0x000000});
-	//材質オブジェクトの宣言と生成
-	var material_black = new THREE.MeshFaceMaterial(materials_black);
-
 	var object_tree_params = [
 	    { name:"body", type:"circle", posi:[0,0,0], size:25,
 	      color:material_white },
 	    { name:"headGroup",
 	      group:[
 	        { name:"rightEar", type:"circle", posi:[15,46, 5], size:10,
-	          color:material_black },
+	          color:'black' },
 	        { name:"leftEar", type:"circle", posi:[-15,46, 5], size:10,
-	          color:material_black },
+	          color:'black' },
 	        { name:"face", type:"circle", posi:[0, 30, 5], size:18,
 	          texture:{imgsrc:"minipanda.png", offset:[0.3, 0, 0] }
 	        }
 	      ]
 	    },
 	    { name:"rightArm", type:"circle", posi:[15, 10, 10], size:10,
-		color:material_black },
+		color:'black' },
 	    { name:"leftArm", type:"circle", posi:[-15, 10, 10], size:10,
-		color:material_black },
+		color:'black' },
 	    { name:"rightLeg", type:"circle", posi:[20, -10, 10], size:10,
-		color:material_black },
+		color:'black' },
 	    { name:"leftLeg", type:"circle", posi:[-20, -10, 10], size:10,
-		color:material_black },
+		color:'black' },
 	];
      
 	var object_tree = {};

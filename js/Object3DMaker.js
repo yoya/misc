@@ -19,16 +19,21 @@ Object3DMaker.prototype = {
 	     } else {
 	        var geometry = new THREE.SphereGeometry(param.size, 24, 24);
 	        var map = null;
-	        var color = param.color;
+	        var material = param.material;
 	        if ("texture" in param) {
 	            var texture = param.texture;
 	            map = new THREE.ImageUtils.loadTexture(texture.imgsrc);
 		    var toff = texture.offset;
 		    map.offset.set(toff[0], toff[1], toff[2]);
-	            color = new THREE.MeshPhongMaterial({map: map});
+	            material = new THREE.MeshPhongMaterial({map: map});
 	        }
+		if ("color" in param) {
+	  	//材質オブジェクトの宣言と生成
+                  var material_basic = new THREE.MeshBasicMaterial({color:param.color});
+		  material = new THREE.MeshFaceMaterial([material_basic]);
+		}
 	        //立方体オブジェクトの生成
-	        var obj = new THREE.Mesh(geometry, color);
+	        var obj = new THREE.Mesh(geometry, material);
 		var posi = param.posi;
 	        obj.position.set( posi[0], posi[1], posi[2]);
 	        // 立方体オブジェクトのシーンへの追加
