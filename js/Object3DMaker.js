@@ -18,8 +18,11 @@ Object3DMaker.prototype = {
 	        var obj = this._make(param.group, object_tree_child[param.name]);
 	     } else {
 		switch (param.type) {
-		case 'circle':
-		    var geometry = new THREE.SphereGeometry(param.size, 24, 24);
+		case 'sphere':
+		    var geometry = new THREE.SphereGeometry(param.width, param.height);
+		    break;
+		case 'plane':
+		    var geometry = new THREE.PlaneGeometry(param.size, 24, 24);
 		    break;
 		case 'polygon':
 		    var shape = new THREE.Shape();
@@ -27,7 +30,8 @@ Object3DMaker.prototype = {
 		    for (var j = 1 ; j < param.edges.length ; j++) {
 			shape.lineTo(param.edges[j][0], param.edges[j][1], 0);
 		    }
-		    var extrudeSettings = { amount: 0,  bevelSegments: 0 };
+		    var amount = param.amount ? param.amount : 0;
+		    var extrudeSettings = { amount: amount,  bevelSegments: 0 };
 		    var centerStreet3d = shape.extrude( extrudeSettings );
 		    var centerStreetPoints = shape.createPointsGeometry();
 		    var centerStreetSpacedPoints = shape.createSpacedPointsGeometry();
@@ -37,15 +41,15 @@ Object3DMaker.prototype = {
 		    console.error("Unknown type:"+param.type);
 		    break;
 		}
-	        var map = null;
-	        var material = param.material;
-	        if ("texture" in param) {
-	            var texture = param.texture;
-	            map = new THREE.ImageUtils.loadTexture(texture.imgsrc);
-		    var toff = texture.offset;
-		    map.offset.set(toff[0], toff[1], toff[2]);
-	            material = new THREE.MeshPhongMaterial({map: map});
-	        }
+        var map = null;
+        var material = param.material;
+        if ("texture" in param) {
+            var texture = param.texture;
+            map = new THREE.ImageUtils.loadTexture(texture.imgsrc);
+	    var toff = texture.offset;
+	    map.offset.set(toff[0], toff[1], toff[2]);
+            material = new THREE.MeshPhongMaterial({map: map});
+        }
 		if ("color" in param) {
 	  	//材質オブジェクトの宣言と生成
                   var material_basic = new THREE.MeshBasicMaterial({color:param.color});
