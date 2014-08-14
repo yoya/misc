@@ -19,7 +19,7 @@ Object3DMaker.prototype = {
 	     } else {
 		switch (param.type) {
 		case 'sphere':
-		    var geometry = new THREE.SphereGeometry(param.width, param.height);
+		    var geometry = new THREE.SphereGeometry(param.size, 24, 24);
 		    break;
 		case 'plane':
 		    var geometry = new THREE.PlaneGeometry(param.width, param.height);
