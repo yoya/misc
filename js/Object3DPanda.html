@@ -130,29 +130,29 @@ function makePanda() {
               edges:[[0,  100],
                      [-100,  -100], [100, -100]],
               color:"red"},
-	    { name:"body", type:"circle", posi:[0,0,0], size:25,
+	    { name:"body", type:"sphere", posi:[0,0,0], size:25,
 	      color:'white' },
 	    { name:"headGroup",
 	      group:[
-	        { name:"rightEar", type:"circle", posi:[15,46, 5], size:10,
+	        { name:"rightEar", type:"sphere", posi:[15,46, 5], size:10,
 	          color:'black' },
-	        { name:"leftEar", type:"circle", posi:[-15,46, 5], size:10,
+	        { name:"leftEar", type:"sphere", posi:[-15,46, 5], size:10,
 	          color:'black' },
-	        { name:"face", type:"circle", posi:[0, 30, 5], size:18,
+	        { name:"face", type:"sphere", posi:[0, 30, 5], size:18,
 	          texture:{imgsrc:"minipanda.png", offset:[0.3, 0, 0] }
 	        }
 	      ]
 	    },
-	    { name:"rightArm", type:"circle", posi:[15, 10, 10], size:10,
+	    { name:"rightArm", type:"sphere", posi:[15, 10, 10], size:10,
 		color:'black' },
-	    { name:"leftArm", type:"circle", posi:[-15, 10, 10], size:10,
+	    { name:"leftArm", type:"sphere", posi:[-15, 10, 10], size:10,
 		color:'black' },
-	    { name:"rightLeg", type:"circle", posi:[20, -10, 10], size:10,
+	    { name:"rightLeg", type:"sphere", posi:[20, -10, 10], size:10,
 		color:'black' },
-	    { name:"leftLeg", type:"circle", posi:[-20, -10, 10], size:10,
+	    { name:"leftLeg", type:"sphere", posi:[-20, -10, 10], size:10,
 		color:'black' },
 	];
-     
+
 	var object_tree = {};
         pandaObject = new Object3DMaker();
         pandagroup = pandaObject.make(object_tree_params);
