@@ -24,11 +24,14 @@ Object3DMaker.prototype = {
             case 'plane':
                 var geometry = new THREE.PlaneGeometry(param.width, param.height);
                 break;
+            case 'cylinder':
+               var geometry = new THREE.CylinderGeometry(param.radiusTop, param.radiusBottom,param.height,param.radiusSegments);
+                break;
             case 'polygon':
                 var shape = new THREE.Shape();
                 shape.moveTo(param.edges[0][0], param.edges[0][1], 0);
                 for (var j = 1 ; j < param.edges.length ; j++) {
-                shape.lineTo(param.edges[j][0], param.edges[j][1], 0);
+                    shape.lineTo(param.edges[j][0], param.edges[j][1], 0);
                 }
                 var amount = param.amount ? param.amount : 0;
                 var extrudeSettings = { amount: amount,  bevelSegments: 0 };
@@ -42,6 +45,25 @@ Object3DMaker.prototype = {
                 break;
             }
             var map = null;
+            var materialType = THREE.MeshBasicMaterial;
+            if("materialtype" in param){
+                switch( param.materialtype ){
+                    case "Phong":
+                        materialType = THREE.MeshPhongMaterial;
+                        break;
+                    case "Lambert":
+                        materialType = THREE.MeshLambertMaterial;
+                        break;
+                    case "Face":
+                        materialType = THREE.MeshFaceMaterial;
+                        break;
+                    default:
+                        materialType = THREE.MeshBasicMaterial;
+                        break;
+                }
+            }
+
+
             var material = param.material;
             if ("texture" in param) {
                 var texture = param.texture;
@@ -49,11 +71,14 @@ Object3DMaker.prototype = {
                 var toff = texture.offset;
                 map.offset.set(toff[0], toff[1], toff[2]);
                 material = new THREE.MeshPhongMaterial({map: map});
+                if( "repeat" in  texture ){
+                    map.wrapS = THREE.RepeatWrapping;
+                    map.wrapT = THREE.RepeatWrapping;
+                    map.repeat.set( texture.x, texture.y );
+                }
             }
             if ("color" in param) {
-            //材質オブジェクトの宣言と生成
-              var material_basic = new THREE.MeshBasicMaterial({color:param.color});
-              material = new THREE.MeshFaceMaterial([material_basic]);
+              material = new materialType({color:param.color});
             }
                 //立方体オブジェクトの生成
             var obj;
@@ -62,6 +87,10 @@ Object3DMaker.prototype = {
                 obj = THREE.SceneUtils.createMultiMaterialObject(geometry, [ new THREE.MeshLambertMaterial( { color: param.color, map: map } ), new THREE.MeshBasicMaterial( { color: 0x00FF00, wireframe: false, transparent: false } ) ] );
             } else {
                 obj = new THREE.Mesh(geometry, material);
+            }
+            if ("rotate" in param) {
+                var rotate = param.rotate;
+                obj.rotation.set(  rotate[0] , rotate[1] , rotate[2] );
             }
             var posi = param.posi;
                 obj.position.set( posi[0], posi[1], posi[2]);
