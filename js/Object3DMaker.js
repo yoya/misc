@@ -24,6 +24,9 @@ Object3DMaker.prototype = {
             case 'plane':
                 var geometry = new THREE.PlaneGeometry(param.width, param.height);
                 break;
+            case 'box':
+                var geometry = new THREE.BoxGeometry(param.width, param.height, param.depth);
+                break;
             case 'cylinder':
                var geometry = new THREE.CylinderGeometry(param.radiusTop, param.radiusBottom,param.height,param.radiusSegments);
                 break;
@@ -80,10 +83,9 @@ Object3DMaker.prototype = {
             if ("color" in param) {
               material = new materialType({color:param.color});
             }
-                //立方体オブジェクトの生成
+            //立方体オブジェクトの生成
             var obj;
             if (param.type === 'polygon') {
-                console.log(param.color);
                 obj = THREE.SceneUtils.createMultiMaterialObject(geometry, [ new THREE.MeshLambertMaterial( { color: param.color, map: map } ), new THREE.MeshBasicMaterial( { color: 0x00FF00, wireframe: false, transparent: false } ) ] );
             } else {
                 obj = new THREE.Mesh(geometry, material);
