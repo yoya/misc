@@ -56,13 +56,13 @@
               src = this.srcQueue.shift();
               gain = this.gainQueue.shift();
               src.disconnect(gain);
-//              src.noteOff(); // XXX?????
+//              src.stop(); // XXX?????
               gain.disconnect(context.destination);
           }
 
           src = context.createBufferSource();
           rate = this.playbackRateList[i];
-          gain = context.createGainNode();
+          gain = context.createGain();
           src.buffer = MusicBox.buffer; // XXX
           src.playbackRate.value = rate;
 //          gain.gain.value = v;
@@ -72,7 +72,7 @@
 //          gain.gain.exponentialRampToValueAtTime(0, context.currentTime + 2);
           src.connect(gain);
           gain.connect(context.destination);
-          src.noteOn(0);
+          src.start(0);
           this.srcQueue.push(src);
           this.gainQueue.push(gain);
       };
