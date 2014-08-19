@@ -181,10 +181,10 @@ function loop() {
 	//トラックボールによるカメラオブジェクトのプロパティの更新
 	trackball.update();
 	if(faceswing < Math.PI / 2 && hidari == false){
-		faceswing += 1/ (2 * Math.PI  * 60 );
+		faceswing += 2 * Math.PI  / 360;
 	}else{
 		hidari = true;
-		faceswing -= 1/ (2 * Math.PI  * 60 );
+		faceswing -= 2 * Math.PI  / 360;
 		if(faceswing < Math.PI / 2 * -1){
 			hidari = false;
 		}
