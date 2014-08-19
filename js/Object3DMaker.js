@@ -98,15 +98,18 @@ Object3DMaker.prototype = {
                 obj.position.set( posi[0], posi[1], posi[2]);
                 // 立方体オブジェクトのシーンへの追加
             }
+	    obj.name = param.name;
             group.add(obj);
             object_tree_child[param.name].obj = obj;
         }
         return group;
     },
-    query: function(path) {
-        if (path === '') {
+    query: function(name) {
+        if (name === '') {
             return this.object_tree.obj;
         }
+	console.log(this.object_tree);
+	return this.object_tree.obj.getObjectByName(name, true);
     }
 };
 
