@@ -1,4 +1,4 @@
-function Object3DMaker()  {
+GGfunction Object3DMaker()  {
     this.object_tree = {child:[]};
 }
 
@@ -15,7 +15,7 @@ Object3DMaker.prototype = {
             object_tree_child[param.name] = {};
             if ("group" in param) {
             object_tree_child[param.name].child = {};
-                var obj = this._make(param.group, object_tree_child[param.name]);
+            var obj = this._make(param.group, object_tree_child[param.name]);
              } else {
             switch (param.type) {
             case 'sphere':
@@ -98,7 +98,7 @@ Object3DMaker.prototype = {
                 obj.position.set( posi[0], posi[1], posi[2]);
                 // 立方体オブジェクトのシーンへの追加
             }
-	    obj.name = param.name;
+            obj.name = param.name;
             group.add(obj);
             object_tree_child[param.name].obj = obj;
         }
@@ -108,8 +108,7 @@ Object3DMaker.prototype = {
         if (name === '') {
             return this.object_tree.obj;
         }
-	console.log(this.object_tree);
-	return this.object_tree.obj.getObjectByName(name, true);
+        return this.object_tree.obj.getObjectByName(name, true);
     }
 };
 
