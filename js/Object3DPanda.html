@@ -157,6 +157,7 @@ function makePanda() {
         pandaObject = new Object3DMaker();
         pandagroup = pandaObject.make(object_tree_params);
 	scene.add(pandagroup);
+	headgroup = pandaObject.query('headGroup');
 }
 
 //パンダのパーツを組み合わせる
@@ -189,8 +190,8 @@ function loop() {
 		}
 	}
 
-	pandagroup.rotation.set( 0 , faceswing  , 0 );
-//	headgroup.rotation.set( 0 , faceswing  , 0 );
+//	pandagroup.rotation.set( 0 , faceswing  , 0 );
+	headgroup.rotation.set( 0 , faceswing  , 0 );
 
 	//ステップ数のインクリメント
 	step++;
