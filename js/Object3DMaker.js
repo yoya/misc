@@ -1,4 +1,4 @@
-GGfunction Object3DMaker()  {
+function Object3DMaker()  {
     this.object_tree = {child:[]};
 }
 
