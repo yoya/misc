@@ -115,6 +115,20 @@ Object3DMaker.prototype = {
             return this.object_tree.obj;
         }
         return this.object_tree.obj.getObjectByName(name, true);
+    },
+    dump: function() {
+	console.log(this.object_tree);
+        this._dump(this.object_tree.obj, 0);
+    }, 
+    _dump: function(obj, level) {
+	indent = '';
+        for (var i = 0 ; i < level ; i++) {
+            indent += '| ';
+        }
+        console.log(indent + obj.name + "=>" + obj.id);
+        for (var i = 0 ; i < obj.children.length ; i++) {
+            this._dump(obj.children[i], level+1)
+        }
     }
 };
 
