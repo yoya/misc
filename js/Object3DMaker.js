@@ -127,7 +127,7 @@ Object3DMaker.prototype = {
         }
 	var name = obj.name;
 	if (name === '') {
-            name = typeof obj.constructor;
+            name = "''";
         }
 	//  console.log(indent + obj.name + "=>" + obj.id);
 	var posi = obj.position;
