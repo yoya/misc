@@ -125,10 +125,17 @@ Object3DMaker.prototype = {
         for (var i = 0 ; i < level ; i++) {
             indent += '| ';
         }
-        console.log(indent + obj.name + "=>" + obj.id);
+	var name = obj.name;
+	if (name === '') {
+            name = typeof obj.constructor;
+        }
+	//  console.log(indent + obj.name + "=>" + obj.id);
+	var posi = obj.position;
+        console.log(indent + name + " => " + obj.id + ", position("+posi.x+","+posi.y+","+posi.z+")");
         for (var i = 0 ; i < obj.children.length ; i++) {
             this._dump(obj.children[i], level+1)
         }
     }
 };
+
 
