@@ -157,6 +157,8 @@ function makePanda() {
         pandaObject = new Object3DMaker();
         pandagroup = pandaObject.make(object_tree_params);
 	scene.add(pandagroup);
+	headgroup = pandaObject.query('headGroup');
+	pandaObject.dump();
 }
 
 //パンダのパーツを組み合わせる
@@ -180,17 +182,17 @@ function loop() {
 	//トラックボールによるカメラオブジェクトのプロパティの更新
 	trackball.update();
 	if(faceswing < Math.PI / 2 && hidari == false){
-		faceswing += 1/ (2 * Math.PI  * 60 );
+		faceswing += 2 * Math.PI  / 360;
 	}else{
 		hidari = true;
-		faceswing -= 1/ (2 * Math.PI  * 60 );
+		faceswing -= 2 * Math.PI  / 360;
 		if(faceswing < Math.PI / 2 * -1){
 			hidari = false;
 		}
 	}
 
-	pandagroup.rotation.set( 0 , faceswing  , 0 );
-//	headgroup.rotation.set( 0 , faceswing  , 0 );
+//	pandagroup.rotation.set( 0 , faceswing  , 0 );
+	headgroup.rotation.set( 0 , faceswing  , 0 );
 
 	//ステップ数のインクリメント
 	step++;
