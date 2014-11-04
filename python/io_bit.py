@@ -122,7 +122,7 @@ class IO_Bit :
             raise Exception("getUI32BE: data_len < offset + 4")
         ret = struct.unpack('>L', self._data[self._byte_offset:self._byte_offset+4])
         self._byte_offset += 4
-        value = ret[1]
+        value = ret[0]
         if value < 0:  # php bugs
             value += 4294967296
         return value
@@ -157,7 +157,7 @@ class IO_Bit :
             raise Exception("getUI32LE: data_len < offset + 4")
         ret = struct.unpack('<L', self._data[self._byte_offset:self._byte_offset+4])
         self._byte_offset += 4
-        value = ret[1]
+        value = ret[0]
         return value # PHP bug
     
     def getUI64LE(self):
