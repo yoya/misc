@@ -147,7 +147,7 @@ class IO_MIDI :
     
 
     def _parseChunkXFInfo(self, reader, nextOffset):
-        xfinfo = {}
+        xfinfo = []
         while True:
             offset, dummy = reader.getOffset()
             if offset >= nextOffset: 
@@ -172,7 +172,7 @@ class IO_MIDI :
     
 
     def _parseChunkXFKaraoke(self, reader, nextOffset):
-        xfkaraoke = {}
+        xfkaraoke = []
 	time = 0
         while True:
             offset, dummy = reader.getOffset()
@@ -339,25 +339,22 @@ class IO_MIDI :
             bitio.input(self._mididata)
         print("HEADER:")
         for key, value in self.header['header'].items(): 
-            print("  %s: %s" % (key, value), end="")
+            print("  %s: %s" % (key, value))
         
         if opts.has_key('hexdump') and opts['hexdump']:
             bitio.hexdump(0, self.header['length'] + 8)
-        
-
-        xfkaraoke_with_track = self.tracks
-
+        xfkaraoke_with_track = {}
+        for idx, value in enumerate(self.tracks):
+            pprint(value);
+            xfkaraoke_with_track["%s" % idx] = value;
 	if self.xfkaraoke != None:
 	    xfkaraoke_with_track["karaoke"] = self.xfkaraoke
             xfkaraoke_with_track["karaoke"]["track"] = self.xfkaraoke["xfkaraoke"]
-        
         for idx, track in enumerate(xfkaraoke_with_track):
             scaleCharactors = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
             print("TRACK[%d]:" % idx)
             if opts.has_key('hexdump') and opts['hexdump']:
                 bitio.hexdump(track['_offset'], 8)
-
-            
             for idx2, chunk in enumerate(track['track']):
                 print("  [%d]:" % idx2, end="")
                 meta_event_type = -1
@@ -544,8 +541,6 @@ class IO_MIDI :
 	    length = len(chunk['MetaEventData'])
             self.putVaribleLengthValue(writer, length)
             writer.putData(chunk['MetaEventData'], length)
-        
-    
 
     def _buildChunkXFKaraoke(self, writer, xfkaraoke, opts):
         prev_status = None
