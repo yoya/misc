@@ -65,7 +65,7 @@ class IO_Bit :
         if len(self._data) < (self._byte_offset + length):
             data_len = len(self._data)
             offset = self._byte_offset
-            raise Exception("getData: data_len < offset + length")
+            raise Exception("getData: %d < %d + %d" % (data_len, offset, length))
         data = self._data[self._byte_offset:self._byte_offset+length]
         data_len = len(data)
         self._byte_offset += data_len
@@ -93,7 +93,7 @@ class IO_Bit :
         if len(self._data) < (self._byte_offset + 1):
             data_len = len(self._data)
             offset = self._byte_offset
-            raise Exception("getUI8: data_len < offset + 1")
+            raise Exception("getUI8: %d < %d + 1" % (data_len, offset))
         value = ord(self._data[self._byte_offset])
         self._byte_offset += 1
         return value
@@ -109,7 +109,7 @@ class IO_Bit :
         if len(self._data) < (self._byte_offset + 2):
             data_len = len(self._data)
             offset = self._byte_offset
-            raise Exception("getUI16BE: data_len < offset + 2")
+            raise Exception("getUI16BE: %d < %d + 2" % (data_len, offset))
         ret = struct.unpack('>H', self._data[self._byte_offset:self._byte_offset + 2])
         self._byte_offset += 2
         return ret[0]
@@ -119,7 +119,7 @@ class IO_Bit :
         if len(self._data) < (self._byte_offset + 4):
             data_len = len(self._data)
             offset = self._byte_offset
-            raise Exception("getUI32BE: data_len < offset + 4")
+            raise Exception("getUI32BE: %d < %d + 4" % (data_len, offset))
         ret = struct.unpack('>L', self._data[self._byte_offset:self._byte_offset+4])
         self._byte_offset += 4
         value = ret[0]
@@ -132,7 +132,7 @@ class IO_Bit :
         if len(self._data) < (self._byte_offset + 2):
             data_len = len(self._data)
             offset = self._byte_offset
-            raise Exception("getUI16LE: data_len < offset + 2")
+            raise Exception("getUI16LE: %d < %d + 2" % (data_len, offset))
         ret = struct.unpack('<H', self._data[self._byte_offset:self._byte_offset+2])
         self._byte_offset += 2
         return ret[0]
@@ -154,7 +154,7 @@ class IO_Bit :
         if len(self._data) < (self._byte_offset + 4):
             data_len = len(self._data)
             offset = self._byte_offset
-            raise Exception("getUI32LE: data_len < offset + 4")
+            raise Exception("getUI32LE: %d < %d + 4" % (data_len, offset))
         ret = struct.unpack('<L', self._data[self._byte_offset:self._byte_offset+4])
         self._byte_offset += 4
         value = ret[0]
@@ -179,7 +179,7 @@ class IO_Bit :
         bit_offset = self._bit_offset
         data_len = len(self._data)
         if data_len <= byte_offset: 
-            raise Exception("getUIBit: data_len <= byte_offset")
+            raise Exception("getUIBit: %d <= %d" % (data_len, byte_offset))
         value = ord(self._data[byte_offset])
         value = 1 & (value >> (7 - bit_offset)) # MSB(Bit) first
         bit_offset  += 1
@@ -213,7 +213,7 @@ class IO_Bit :
         bit_offset = self._bit_offset
         data_len = len(self._data)
         if data_len <= byte_offset:
-            raise Exception("getUIBitLSB: data_len <= byte_offset")
+            raise Exception("getUIBitLSB: %d <= %d" % (data_len, byte_offset))
         value = ord(self._data[byte_offset])
         value = 1 & (value >> bit_offset) # LSB(Bit) first
         bit_offset  += 1
