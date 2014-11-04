@@ -5,16 +5,15 @@ from pprint import pprint
 from io_bit import IO_Bit
 
 class IO_MIDI :
-#    def __init__(self):
+    def __init__(self):
+        self.tracks = []
+        self.xfkaraoke = None
     def parse(self, mididata):
         self._mididata = mididata
         reader = IO_Bit()
         reader.input(mididata)
         while reader.hasNextData(4):
             chunk = self._parseChunk(reader)
-
-            pprint(chunk)
-
             if chunk['type'] == 'MThd':
                 self.header = chunk
             elif chunk['type'] == 'MTrk':
@@ -33,6 +32,10 @@ class IO_MIDI :
         length = reader.getUI32BE()
         nextOffset = offset + 8 + length
         chunk = {'type':type, 'length':length, '_offset':offset}
+
+#        pprint(chunk)
+
+
         if type == 'MThd':
             chunk['header'] = self._parseChunkHeader(reader)
         elif type == 'MTrk':
@@ -63,7 +66,7 @@ class IO_MIDI :
     
 
     def _parseChunkTrack(self, reader, nextOffset):
-        track = {}
+        track = []
         prev_status = None
 	time = 0
         while True:
@@ -75,6 +78,7 @@ class IO_MIDI :
             # delta time
 	    deltaTime = self.getVaribleLengthValue(reader)
             chunk['DeltaTime'] = deltaTime
+
 	    time += deltaTime
             # event
             status = reader.getUI8() # status byte
@@ -117,7 +121,7 @@ class IO_MIDI :
                 value = ((reader.getUI8() & 0x7f) << 7) + (value & 0x7f)
                 chunk['Value'] = value - 0x2000
             elif eventType == 0xF: # Meta Event of System Ex
-                unset(chunk['MIDIChannel'])
+                del chunk['MIDIChannel']
                 if midiChannel == 0xF:  # not midiChannel
                     metaEventType = reader.getUI8()
                     chunk['MetaEventType'] = metaEventType
@@ -215,7 +219,7 @@ class IO_MIDI :
                 ret_value = (ret_value << 7) + (value & 0x7f)
             else:
                 ret_value = (ret_value << 7) + value
-        
+                break;
         return ret_value
     
 
@@ -336,8 +340,8 @@ class IO_MIDI :
             bitio.input(self._mididata)
         
         print "HEADER:\n"
-        for key, value in enumerate(self.header['header']): 
-            print "  key: value\n"
+        for key, value in self.header['header'].items(): 
+            print "  %s: %s" % (key, value)
         
         if opts.has_key('hexdump') and opts['hexdump']:
             bitio.hexdump(0, self.header['length'] + 8)
@@ -349,15 +353,17 @@ class IO_MIDI :
 	    xfkaraoke_with_track["karaoke"] = self.xfkaraoke
             xfkaraoke_with_track["karaoke"]["track"] = self.xfkaraoke["xfkaraoke"]
         
-        for idx, track in enemerate(xfkaraoke_with_track):
+        for idx, track in enumerate(xfkaraoke_with_track):
             scaleCharactors = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
             print "TRACK[idx]:\n"
             if opts.has_key('hexdump') and opts['hexdump']:
                 bitio.hexdump(track['_offset'], 8)
+
             
-            for idx2, chunk in enemerate(track['track']):
+            for idx2, chunk in enumerate(track['track']):
                 print "  [idx2]:"
-                for key, value in enemerate(chunk):
+                for key, value in chunk.items():
+                    pprint(key)
                     if key == 'EventType':
                         if value < 0xFF: 
                             eventname = self.event_name[value]
@@ -392,7 +398,7 @@ class IO_MIDI :
 		            notekey = scaleCharactors[value % 12]
                             print " key:value(notekeynoteoct),"
                     else:
-		        if (key[0] != '_') or (opts.has_key('verbose') and opts['verbose']): 
+		        if (key[0:1] != '_') or (opts.has_key('verbose') and opts['verbose']): 
                             print " key:value,"
                 
                 print "\n"
