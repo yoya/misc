@@ -1,6 +1,8 @@
 #   http:#www.omnibase.net/smf/
 #   http:#www.sonicspot.com/guide/midifiles.html
 
+from __future__ import print_function
+import math
 from pprint import pprint
 from io_bit import IO_Bit
 
@@ -23,7 +25,7 @@ class IO_MIDI :
             elif chunk['type'] == 'XFKM':
                 self.xfkaraoke = chunk
             else:
-                fprintf(STDERR, "Can't parse chunk.\n")
+                sys.stderr.write("Can't parse chunk.")
                 break
 
     def _parseChunk(self, reader):
@@ -32,9 +34,6 @@ class IO_MIDI :
         length = reader.getUI32BE()
         nextOffset = offset + 8 + length
         chunk = {'type':type, 'length':length, '_offset':offset}
-
-#        pprint(chunk)
-
 
         if type == 'MThd':
             chunk['header'] = self._parseChunkHeader(reader)
@@ -49,7 +48,7 @@ class IO_MIDI :
             return {}
         doneOffset, dummy = reader.getOffset()
         if doneOffset != nextOffset: 
-            print "done:doneOffset next:nextOffset".PHP_EOL
+            print("done:%d next:%d" % (doneOffset, nextOffset))
         reader.setOffset(nextOffset, 0)
 
         return chunk
@@ -134,9 +133,9 @@ class IO_MIDI :
                     length = self.getVaribleLengthValue(reader)
                     chunk['SystemExCont'] = reader.getData(length)
                 else:
-                    printf("unknown status=0x%02X\n", status)
+                    print("unknown status=0x%02X" % status)
             else:
-                printf("unknown EventType=0x%02X\n", eventType)
+                printf("unknown EventType=0x%02X" % eventType)
                 var_dump(chunks)
                 exit (0)
             offset2, dummy = reader.getOffset()
@@ -160,7 +159,7 @@ class IO_MIDI :
             status = reader.getUI8() # status byte
             if status != 0xFF: 
                 o, dummy = reader.getOffset()
-                fprintf(STDERR, "Unknown format(0x%02X) offset(0x%x) in XFInfoHeader\n", status, o - 1)
+                sys.stderr.write(STDERR, "Unknown format(0x%02X) offset(0x%x) in XFInfoHeader" % (status, o - 1))
                 break # failed
             
             chunk['MetaEventType'] = reader.getUI8()
@@ -188,7 +187,7 @@ class IO_MIDI :
             status = reader.getUI8() # status byte
             if status != 0xFF: 
                 o, dummy = reader.getOffset()
-                fprintf(STDERR, "Unknown status(0x%02X) offset(0x%x) in xfkaraokeHeader\n", status, o - 1)
+                sys.stderr.write("Unknown status(0x%02X) offset(0x%x) in xfkaraokeHeader\n" % (status, o - 1))
                 break # failed
             
             type = reader.getUI8()
@@ -203,7 +202,7 @@ class IO_MIDI :
                 length = self.getVaribleLengthValue(reader)
             else:
                 o, dummy = reader.getOffset()
-                fprintf(STDERR, "Unknown type(0x%02X) offset(0x%x) in xfkaraokeHeader\n", type, o - 1)
+                sys.stderr.write("Unknown type(0x%02X) offset(0x%x) in xfkaraokeHeader\n" % (type, o - 1))
             
             offset2, dummy = reader.getOffset()
             chunk['_length'] = offset2 - offset
@@ -338,10 +337,9 @@ class IO_MIDI :
         if opts.has_key('hexdump') and opts['hexdump']:
             bitio = IO_Bit()
             bitio.input(self._mididata)
-        
-        print "HEADER:\n"
+        print("HEADER:")
         for key, value in self.header['header'].items(): 
-            print "  %s: %s" % (key, value)
+            print("  %s: %s" % (key, value), end="")
         
         if opts.has_key('hexdump') and opts['hexdump']:
             bitio.hexdump(0, self.header['length'] + 8)
@@ -355,53 +353,52 @@ class IO_MIDI :
         
         for idx, track in enumerate(xfkaraoke_with_track):
             scaleCharactors = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
-            print "TRACK[idx]:\n"
+            print("TRACK[%d]:" % idx)
             if opts.has_key('hexdump') and opts['hexdump']:
                 bitio.hexdump(track['_offset'], 8)
 
             
             for idx2, chunk in enumerate(track['track']):
-                print "  [idx2]:"
+                print("  [%d]:" % idx2, end="")
+                meta_event_type = -1
                 for key, value in chunk.items():
-                    pprint(key)
                     if key == 'EventType':
                         if value < 0xFF: 
                             eventname = self.event_name[value]
                         else:
                             eventname = "Meta Event"
-                        print " key:value(eventname),"
+                        print(" %s:%s(%s)," % (key, value, eventname), end="")
                     elif key == 'MetaEventType':
-                        if self.meta_event_name.kas_key(value):
+                        if self.meta_event_name.has_key(value):
                             meta_event_type = value
                             eventname = self.meta_event_name[value]
-                            print " key:value(eventname),"
+                            print(" %s:%s(%s)," % (key, value, eventname), end="")
                         else:
-                            print " key:value,"
+                            print(" %s:%s," % (key, value), end="")
                         
                     elif key == 'ControllerType':
                         typename = self.controller_type_name[value]
-                        print " key:value(typename),"
+                        print(" %s:%s(%s)," % (key, value, typename), end="")
                     elif key ==  'SystemEx' or key ==  'SystemExCont' or key ==  'MetaEventData':
-                        print " key:"
+                        print(" %s:" % key, end="")
                         dataLen = len(value)
                         if (key == 'MetaEventData') and (meta_event_type == 0x05):
-                            print mb_convert_encoding( value, "UTF-8" , "SJIS")
-                        
-                        print "("
+                            print(value.decude('sjis'), end="")
+                        print("(", end="")
                         i = 0
                         while i < dataLen:
-                           printf("%02x", ord(valuei))
+                           print("%02x" % ord(value[0:1]), end="")
                            i += 1
-                        print ")"
+                        print(")", end="")
                     elif key ==  'NoteNumber':
-		            noteoct = floor(value / 12)
+		            noteoct = math.floor(value / 12)
 		            notekey = scaleCharactors[value % 12]
-                            print " key:value(notekeynoteoct),"
+                            print(" %s:%s(%s%d)," % (key, value, notekey, noteoct), end="")
                     else:
 		        if (key[0:1] != '_') or (opts.has_key('verbose') and opts['verbose']): 
-                            print " key:value,"
+                            print(" %s:%s," % (key, value), end="")
                 
-                print "\n"
+                print("")
                 if opts.has_key('hexdump') and opts['hexdump']:
                     bitio.hexdump(chunk['_offset'], chunk['_length'])
 
@@ -521,10 +518,10 @@ class IO_MIDI :
                    self.putVaribleLengthValue(writer, length)
                    writer.putData(chunk['SystemExCont'], length)
                else:
-                   printf("unknown status=0x%02X\n", status)
+                   print("unknown status=0x%02X\n" % status, end="")
                 
            else:
-               printf("unknown EventType=0x%02X\n", eventType)
+               print("unknown EventType=0x%02X\n" % eventType, end="")
                exit (0)
            
         
