@@ -1,5 +1,6 @@
 #   http:#www.omnibase.net/smf/
 #   http:#www.sonicspot.com/guide/midifiles.html
+#  env PYTHONIOENCODING=<your terminal encoding>
 
 from __future__ import print_function
 import sys
@@ -351,8 +352,8 @@ class IO_MIDI :
                             eventname = "Meta Event"
                         fp.write(" {0}:{1}({2}),".format(key, value, eventname))
                     elif key == 'MetaEventType':
+                        meta_event_type = value
                         if self.meta_event_name.has_key(value):
-                            meta_event_type = value
                             eventname = self.meta_event_name[value]
                             fp.write(" {0}:{1}({2}),".format(key, value, eventname))
                         else:
@@ -365,17 +366,17 @@ class IO_MIDI :
                         fp.write(" {0}:".format(key))
                         dataLen = len(value)
                         if (key == 'MetaEventData') and (meta_event_type == 0x05):
-                            fp.write(value.decude('sjis'))
+                            fp.write(value.decode('SJIS'))
                         fp.write("(")
                         i = 0
                         while i < dataLen:
-                           fp.write("{:02x}".format(ord(value[0:1])))
+                           fp.write("{:02x}".format(ord(value[i:i+1])))
                            i += 1
                         fp.write(")")
                     elif key ==  'NoteNumber':
 		            noteoct = math.floor(value / 12)
 		            notekey = scaleCharactors[value % 12]
-                            fp.write(" {0}:{1}({2}{3}),".format(key, value, notekey, noteoct))
+                            fp.write(" {:s}:{:d}({:s}{:.0f}),".format(key, value, notekey, noteoct))
                     else:
 		        if (key[0:1] != '_') or (opts.has_key('verbose') and opts['verbose']): 
                             fp.write(" {0}:{1},".format(key, value))
