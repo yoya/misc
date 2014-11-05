@@ -49,7 +49,7 @@ class IO_MIDI :
             return {}
         doneOffset, dummy = reader.getOffset()
         if doneOffset != nextOffset: 
-            print("done:{0} next:{1}".format(doneOffset, nextOffset))
+            sys.stderr.write("done:{0} next:{1}\n".format(doneOffset, nextOffset))
         reader.setOffset(nextOffset, 0)
         return chunk
 
@@ -127,9 +127,9 @@ class IO_MIDI :
                     length = self.getVaribleLengthValue(reader)
                     chunk['SystemExCont'] = reader.getData(length)
                 else:
-                    print("unknown status=0x%02X" % status)
+                    sys.stderr.write("unknown status=0x{:02X}\n".format(status))
             else:
-                printf("unknown EventType=0x%02X" % eventType)
+                sys.stderr.write("unknown EventType=0x{:02X}\n".format(eventType))
                 var_dump(chunks)
                 exit (0)
             offset2, dummy = reader.getOffset()
@@ -331,18 +331,17 @@ class IO_MIDI :
             bitio.hexdump(0, self.header['length'] + 8)
         xfkaraoke_with_track = {}
         for idx, value in enumerate(self.tracks):
-            pprint(value)
-            xfkaraoke_with_track["%s" % idx] = value;
+            xfkaraoke_with_track["{0}".format(idx)] = value;
 	if self.xfkaraoke != None:
 	    xfkaraoke_with_track["karaoke"] = self.xfkaraoke
             xfkaraoke_with_track["karaoke"]["track"] = self.xfkaraoke["xfkaraoke"]
         for idx, track in enumerate(xfkaraoke_with_track):
             scaleCharactors = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
-            fp.write("TRACK[%d]:\n" % idx)
+            fp.write("TRACK[{0}]:\n".format(idx))
             if opts.has_key('hexdump') and opts['hexdump']:
                 bitio.hexdump(track['_offset'], 8)
             for idx2, chunk in enumerate(track['track']):
-                fp.write("  [%d]:" % idx2)
+                fp.write("  [{0}:".format(idx2))
                 meta_event_type = -1
                 for key, value in chunk.items():
                     if key == 'EventType':
@@ -363,14 +362,14 @@ class IO_MIDI :
                         typename = self.controller_type_name[value]
                         fp.write(" {0}:{1}({2}),".format(key, value, typename))
                     elif key ==  'SystemEx' or key ==  'SystemExCont' or key ==  'MetaEventData':
-                        fp.write(" %s:" % key)
+                        fp.write(" {0}:".format(key))
                         dataLen = len(value)
                         if (key == 'MetaEventData') and (meta_event_type == 0x05):
                             fp.write(value.decude('sjis'))
                         fp.write("(")
                         i = 0
                         while i < dataLen:
-                           fp.write("%02x" % ord(value[0:1]))
+                           fp.write("{:02x}".format(ord(value[0:1])))
                            i += 1
                         fp.write(")")
                     elif key ==  'NoteNumber':
@@ -491,9 +490,9 @@ class IO_MIDI :
                    self.putVaribleLengthValue(writer, length)
                    writer.putData(chunk['SystemExCont'], length)
                else:
-                   print("unknown status=0x%02X\n" % status, end="")
+                   sys.stderr.write("unknown status=0x{:02X}\n".format(status), end="")
            else:
-               print("unknown EventType=0x%02X\n" % eventType, end="")
+               sys.stderr.write("unknown EventType=0x{:02X}\n".format(eventType), end="")
                exit (0)
 
     def _buildChunkXFInfo(self, writer, xfinfo, opts):
