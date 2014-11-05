@@ -49,7 +49,7 @@ class IO_MIDI :
             return {}
         doneOffset, dummy = reader.getOffset()
         if doneOffset != nextOffset: 
-            print("done:%d next:%d" % (doneOffset, nextOffset))
+            print("done:{0} next:{1}".format(doneOffset, nextOffset))
         reader.setOffset(nextOffset, 0)
 
         return chunk
@@ -160,7 +160,7 @@ class IO_MIDI :
             status = reader.getUI8() # status byte
             if status != 0xFF: 
                 o, dummy = reader.getOffset()
-                sys.stderr.write(STDERR, "Unknown format(0x%02X) offset(0x%x) in XFInfoHeader" % (status, o - 1))
+                sys.stderr.write("Unknown format(0x{:02X}) offset(0x{:x}) in XFInfoHeader".format(status, o - 1))
                 break # failed
             
             chunk['MetaEventType'] = reader.getUI8()
@@ -188,7 +188,7 @@ class IO_MIDI :
             status = reader.getUI8() # status byte
             if status != 0xFF: 
                 o, dummy = reader.getOffset()
-                sys.stderr.write("Unknown status(0x%02X) offset(0x%x) in xfkaraokeHeader\n" % (status, o - 1))
+                sys.stderr.write("Unknown status(0x{:02X}) offset(0x{:x}) in xfkaraokeHeader\n".format(status, o - 1))
                 break # failed
             
             type = reader.getUI8()
@@ -203,7 +203,7 @@ class IO_MIDI :
                 length = self.getVaribleLengthValue(reader)
             else:
                 o, dummy = reader.getOffset()
-                sys.stderr.write("Unknown type(0x%02X) offset(0x%x) in xfkaraokeHeader\n" % (type, o - 1))
+                sys.stderr.write("Unknown type(0x{:02X}) offset(0x{:x}) in xfkaraokeHeader\n".format(type, o - 1))
             
             offset2, dummy = reader.getOffset()
             chunk['_length'] = offset2 - offset
@@ -340,7 +340,7 @@ class IO_MIDI :
             bitio.input(self._mididata)
         fp.write("HEADER:\n")
         for key, value in self.header['header'].items(): 
-            fp.write("  %s: %s\n" % (key, value))
+            fp.write("  {0}: {1}\n".format(key, value))
         
         if opts.has_key('hexdump') and opts['hexdump']:
             bitio.hexdump(0, self.header['length'] + 8)
@@ -365,18 +365,18 @@ class IO_MIDI :
                             eventname = self.event_name[value]
                         else:
                             eventname = "Meta Event"
-                        fp.write(" %s:%s(%s)," % (key, value, eventname))
+                        fp.write(" {0}:{1}({2}),".format(key, value, eventname))
                     elif key == 'MetaEventType':
                         if self.meta_event_name.has_key(value):
                             meta_event_type = value
                             eventname = self.meta_event_name[value]
-                            fp.write(" %s:%s(%s)," % (key, value, eventname))
+                            fp.write(" {0}:{1}({2}),".format(key, value, eventname))
                         else:
-                            fp.write(" %s:%s," % (key, value))
+                            fp.write(" {0}:{1},".format(key, value))
                         
                     elif key == 'ControllerType':
                         typename = self.controller_type_name[value]
-                        fp.write(" %s:%s(%s)," % (key, value, typename))
+                        fp.write(" {0}:{1}({2}),".format(key, value, typename))
                     elif key ==  'SystemEx' or key ==  'SystemExCont' or key ==  'MetaEventData':
                         fp.write(" %s:" % key)
                         dataLen = len(value)
@@ -391,10 +391,10 @@ class IO_MIDI :
                     elif key ==  'NoteNumber':
 		            noteoct = math.floor(value / 12)
 		            notekey = scaleCharactors[value % 12]
-                            fp.write(" %s:%s(%s%d)," % (key, value, notekey, noteoct))
+                            fp.write(" {0}:{1}({2}{3}),".format(key, value, notekey, noteoct))
                     else:
 		        if (key[0:1] != '_') or (opts.has_key('verbose') and opts['verbose']): 
-                            fp.write(" %s:%s," % (key, value))
+                            fp.write(" {0}:{1},".format(key, value))
                 
                 fp.write("\n")
                 if opts.has_key('hexdump') and opts['hexdump']:
