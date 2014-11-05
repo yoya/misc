@@ -227,7 +227,7 @@ class IO_MIDI :
         0x02:'Copyright Notice',
         0x03:'Sequence/Track Name',
         0x04:'Instrument Name',
-        0x05:'Lylic',
+        0x05:'Lyric',
         0x06:'Marker',
         0x07:'Cue Point',
         0x20:'MIDI Channel Prefix',
