@@ -11,6 +11,7 @@ class IO_MIDI :
     def __init__(self):
         self.tracks = []
         self.xfkaraoke = None
+
     def parse(self, mididata):
         self._mididata = mididata
         reader = IO_Bit()
@@ -35,7 +36,6 @@ class IO_MIDI :
         length = reader.getUI32BE()
         nextOffset = offset + 8 + length
         chunk = {'type':type, 'length':length, '_offset':offset}
-
         if type == 'MThd':
             chunk['header'] = self._parseChunkHeader(reader)
         elif type == 'MTrk':
@@ -51,9 +51,7 @@ class IO_MIDI :
         if doneOffset != nextOffset: 
             print("done:{0} next:{1}".format(doneOffset, nextOffset))
         reader.setOffset(nextOffset, 0)
-
         return chunk
-    
 
     def _parseChunkHeader(self, reader):
         header = {}
@@ -63,7 +61,6 @@ class IO_MIDI :
         header['DivisionFlag'] = division >> 15
         header['Division'] = division & 0x7fff
         return header
-    
 
     def _parseChunkTrack(self, reader, nextOffset):
         track = []
@@ -73,19 +70,16 @@ class IO_MIDI :
             offset, dummy = reader.getOffset()
             if offset >= nextOffset: 
                 break # done
-            
             chunk = {'_offset': offset}
             # delta time
 	    deltaTime = self.getVaribleLengthValue(reader)
             chunk['DeltaTime'] = deltaTime
-
 	    time += deltaTime
             # event
             status = reader.getUI8() # status byte
             while status < 0x80:  # running status
                 status = prev_status
                 reader.incrementOffset(-1, 0) # 1 byte back
-            
             eventType = status >> 4
             midiChannel = status & 0x0f
             chunk['EventType'] = eventType
@@ -111,7 +105,6 @@ class IO_MIDI :
                     chunk['MSB'] = reader.getUI8()
                 else:
                     chunk['Value'] = reader.getUI8()
-                    
             elif eventType == 0xC: # Program Change
                 chunk['ProgramNumber'] =  reader.getUI8()
             elif eventType == 0xD: # Note Aftertouch Event
@@ -145,7 +138,6 @@ class IO_MIDI :
             track.append(chunk)
             prev_status = status
         return track
-    
 
     def _parseChunkXFInfo(self, reader, nextOffset):
         xfinfo = []
@@ -153,7 +145,6 @@ class IO_MIDI :
             offset, dummy = reader.getOffset()
             if offset >= nextOffset: 
                 break # done
-            
             chunk = {'_offset':offset}
             # delta time
             chunk['DeltaTime'] = self.getVaribleLengthValue(reader)
@@ -162,7 +153,6 @@ class IO_MIDI :
                 o, dummy = reader.getOffset()
                 sys.stderr.write("Unknown format(0x{:02X}) offset(0x{:x}) in XFInfoHeader".format(status, o - 1))
                 break # failed
-            
             chunk['MetaEventType'] = reader.getUI8()
             length = self.getVaribleLengthValue(reader)
             chunk['MetaEventData'] = reader.getData(length)
@@ -171,7 +161,6 @@ class IO_MIDI :
             xfinfo.append(chunk)
         return xfinfo
     
-
     def _parseChunkXFKaraoke(self, reader, nextOffset):
         xfkaraoke = []
 	time = 0
@@ -190,7 +179,6 @@ class IO_MIDI :
                 o, dummy = reader.getOffset()
                 sys.stderr.write("Unknown status(0x{:02X}) offset(0x{:x}) in xfkaraokeHeader\n".format(status, o - 1))
                 break # failed
-            
             type = reader.getUI8()
             chunk['MetaEventType'] = type
             if type == 0x05:    #karaoke
@@ -204,7 +192,6 @@ class IO_MIDI :
             else:
                 o, dummy = reader.getOffset()
                 sys.stderr.write("Unknown type(0x{:02X}) offset(0x{:x}) in xfkaraokeHeader\n".format(type, o - 1))
-            
             offset2, dummy = reader.getOffset()
             chunk['_length'] = offset2 - offset
 	    chunk['_time'] = time
@@ -222,7 +209,6 @@ class IO_MIDI :
                 break;
         return ret_value
     
-
     event_name = {
         0x8:'Note Off',
         0x9:'Note On',
@@ -341,7 +327,6 @@ class IO_MIDI :
         fp.write("HEADER:\n")
         for key, value in self.header['header'].items(): 
             fp.write("  {0}: {1}\n".format(key, value))
-        
         if opts.has_key('hexdump') and opts['hexdump']:
             bitio.hexdump(0, self.header['length'] + 8)
         xfkaraoke_with_track = {}
@@ -395,7 +380,6 @@ class IO_MIDI :
                     else:
 		        if (key[0:1] != '_') or (opts.has_key('verbose') and opts['verbose']): 
                             fp.write(" {0}:{1},".format(key, value))
-                
                 fp.write("\n")
                 if opts.has_key('hexdump') and opts['hexdump']:
                     bitio.hexdump(chunk['_offset'], chunk['_length'])
@@ -405,16 +389,13 @@ class IO_MIDI :
         self._buildChunk(writer, self.header, opts)
         for track in self.tracks: 
             self._buildChunk(writer, track, opts)
-        
 	if self.xfinfo: 
             self._buildChunk(writer, self.xfinfo, opts)
-        
 	if self.xfkaraoke: 
             self._buildChunk(writer, self.xfkaraoke, opts)
         
         return writer.output()
     
-
     def _buildChunk(self, writer, chunk, opts):
         type = chunk['type']
         writerChunk = IO_Bit()
@@ -428,20 +409,17 @@ class IO_MIDI :
               self._buildChunkXFKaraoke(writerChunk, chunk['xfkaraoke'], opts)
         else:
               raise Exception("Unknown chunk (type=type)\n")
-        
         chunkData = writerChunk.output()
         length = len(chunkData)
         writer.putData(type , 4)
         writer.putUI32BE(length)
         writer.putData(chunkData, length)
     
-
     def _buildChunkHeader(self, writer, header, opts):
         writer.putUI16BE(header['Format'])
         writer.putUI16BE(header['NumberOfTracks'])
         division = (header['DivisionFlag'] << 15) | header['Division']
         writer.putUI16BE(division)
-    
 
     def _buildChunkTrack(self, writer, track, opts):
         prev_status = None
@@ -459,8 +437,6 @@ class IO_MIDI :
                    midiChannel = 0x7
                else:
                    raise Exception("unknown MetaEventType")
-               
-           
            status = eventType << 4 | midiChannel
            if empty(opts['runningstatus'] == True):
                writer.putUI8(status)
@@ -468,7 +444,6 @@ class IO_MIDI :
                if prev_status != status: 
                    writer.putUI8(status)
                    prev_status = status
-
            if eventType == 0x8 or eventType == 0x9:
                # Note Off # Note On
                writer.putUI8(chunk['NoteNumber'])
@@ -517,13 +492,9 @@ class IO_MIDI :
                    writer.putData(chunk['SystemExCont'], length)
                else:
                    print("unknown status=0x%02X\n" % status, end="")
-                
            else:
                print("unknown EventType=0x%02X\n" % eventType, end="")
                exit (0)
-           
-        
-    
 
     def _buildChunkXFInfo(self, writer, xfinfo, opts):
         prev_status = None
@@ -536,8 +507,6 @@ class IO_MIDI :
                if prev_status != status: 
                    writer.putUI8(status)
                    prev_status = status
-               
-            
             writer.putUI8(chunk['MetaEventType'])
 	    length = len(chunk['MetaEventData'])
             self.putVaribleLengthValue(writer, length)
@@ -554,8 +523,6 @@ class IO_MIDI :
                if prev_status != status: 
                    writer.putUI8(status)
                    prev_status = status
-               
-            
 	    type = chunk['MetaEventType']
             writer.putUI8(type)
 	    if type == 0x2F:  # End of Track
@@ -564,9 +531,6 @@ class IO_MIDI :
                 length = len(chunk['MetaEventData'])
                 self.putVaribleLengthValue(writer, length)
                 writer.putData(chunk['MetaEventData'], length)
-            
-        
-    
 
     def putVaribleLengthValue(self, writer, value):
         binList = []
@@ -576,7 +540,6 @@ class IO_MIDI :
             while value > 0:
                 binList.append(value & 0x7F)
                 value >>= 7
-        
         while len(binList) > 1:
             bin = array_pop(binList)
             writer.putUI8(0x80 | bin)
