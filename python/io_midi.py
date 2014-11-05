@@ -335,7 +335,7 @@ class IO_MIDI :
 	if self.xfkaraoke != None:
 	    xfkaraoke_with_track["karaoke"] = self.xfkaraoke
             xfkaraoke_with_track["karaoke"]["track"] = self.xfkaraoke["xfkaraoke"]
-        for idx, track in enumerate(xfkaraoke_with_track):
+        for idx, track in xfkaraoke_with_track.items():
             scaleCharactors = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
             fp.write("TRACK[{0}]:\n".format(idx))
             if opts.has_key('hexdump') and opts['hexdump']:
