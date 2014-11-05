@@ -5,6 +5,7 @@
 from __future__ import print_function
 import sys
 import math
+from collections import OrderedDict
 from pprint import pprint
 from io_bit import IO_Bit
 
@@ -55,7 +56,7 @@ class IO_MIDI :
         return chunk
 
     def _parseChunkHeader(self, reader):
-        header = {}
+        header = OrderedDict()
         header['Format'] = reader.getUI16BE()
         header['NumberOfTracks'] = reader.getUI16BE()
         division = reader.getUI16BE()
@@ -71,7 +72,7 @@ class IO_MIDI :
             offset, dummy = reader.getOffset()
             if offset >= nextOffset: 
                 break # done
-            chunk = {'_offset': offset}
+            chunk = OrderedDict(_offset=offset)
             # delta time
 	    deltaTime = self.getVaribleLengthValue(reader)
             chunk['DeltaTime'] = deltaTime
@@ -146,7 +147,7 @@ class IO_MIDI :
             offset, dummy = reader.getOffset()
             if offset >= nextOffset: 
                 break # done
-            chunk = {'_offset':offset}
+            chunk = OrderedDict(_offset=offset)
             # delta time
             chunk['DeltaTime'] = self.getVaribleLengthValue(reader)
             status = reader.getUI8() # status byte
@@ -169,7 +170,7 @@ class IO_MIDI :
             offset, dummy = reader.getOffset()
             if offset >= nextOffset: 
                 break # done
-            chunk = {'_offset':offset}
+            chunk = OrderedDict(_offset=offset)
             # delta time
 	    deltaTime = self.getVaribleLengthValue(reader)
             chunk['DeltaTime'] = deltaTime
