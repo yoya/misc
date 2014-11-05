@@ -2,6 +2,7 @@
 #   http:#www.sonicspot.com/guide/midifiles.html
 
 from __future__ import print_function
+import sys
 import math
 from pprint import pprint
 from io_bit import IO_Bit
@@ -333,30 +334,30 @@ class IO_MIDI :
         126:'MonoOperation', 127:'PolyOperation',
     }
 
-    def dump(self, opts = {}):
+    def dump(self, fp = sys.stdout, opts = {}):
         if opts.has_key('hexdump') and opts['hexdump']:
             bitio = IO_Bit()
             bitio.input(self._mididata)
-        print("HEADER:")
+        fp.write("HEADER:\n")
         for key, value in self.header['header'].items(): 
-            print("  %s: %s" % (key, value))
+            fp.write("  %s: %s\n" % (key, value))
         
         if opts.has_key('hexdump') and opts['hexdump']:
             bitio.hexdump(0, self.header['length'] + 8)
         xfkaraoke_with_track = {}
         for idx, value in enumerate(self.tracks):
-            pprint(value);
+            pprint(value)
             xfkaraoke_with_track["%s" % idx] = value;
 	if self.xfkaraoke != None:
 	    xfkaraoke_with_track["karaoke"] = self.xfkaraoke
             xfkaraoke_with_track["karaoke"]["track"] = self.xfkaraoke["xfkaraoke"]
         for idx, track in enumerate(xfkaraoke_with_track):
             scaleCharactors = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
-            print("TRACK[%d]:" % idx)
+            fp.write("TRACK[%d]:\n" % idx)
             if opts.has_key('hexdump') and opts['hexdump']:
                 bitio.hexdump(track['_offset'], 8)
             for idx2, chunk in enumerate(track['track']):
-                print("  [%d]:" % idx2, end="")
+                fp.write("  [%d]:" % idx2)
                 meta_event_type = -1
                 for key, value in chunk.items():
                     if key == 'EventType':
@@ -364,38 +365,38 @@ class IO_MIDI :
                             eventname = self.event_name[value]
                         else:
                             eventname = "Meta Event"
-                        print(" %s:%s(%s)," % (key, value, eventname), end="")
+                        fp.write(" %s:%s(%s)," % (key, value, eventname))
                     elif key == 'MetaEventType':
                         if self.meta_event_name.has_key(value):
                             meta_event_type = value
                             eventname = self.meta_event_name[value]
-                            print(" %s:%s(%s)," % (key, value, eventname), end="")
+                            fp.write(" %s:%s(%s)," % (key, value, eventname))
                         else:
-                            print(" %s:%s," % (key, value), end="")
+                            fp.write(" %s:%s," % (key, value))
                         
                     elif key == 'ControllerType':
                         typename = self.controller_type_name[value]
-                        print(" %s:%s(%s)," % (key, value, typename), end="")
+                        fp.write(" %s:%s(%s)," % (key, value, typename))
                     elif key ==  'SystemEx' or key ==  'SystemExCont' or key ==  'MetaEventData':
-                        print(" %s:" % key, end="")
+                        fp.write(" %s:" % key)
                         dataLen = len(value)
                         if (key == 'MetaEventData') and (meta_event_type == 0x05):
-                            print(value.decude('sjis'), end="")
-                        print("(", end="")
+                            fp.write(value.decude('sjis'))
+                        fp.write("(")
                         i = 0
                         while i < dataLen:
-                           print("%02x" % ord(value[0:1]), end="")
+                           fp.write("%02x" % ord(value[0:1]))
                            i += 1
-                        print(")", end="")
+                        fp.write(")")
                     elif key ==  'NoteNumber':
 		            noteoct = math.floor(value / 12)
 		            notekey = scaleCharactors[value % 12]
-                            print(" %s:%s(%s%d)," % (key, value, notekey, noteoct), end="")
+                            fp.write(" %s:%s(%s%d)," % (key, value, notekey, noteoct))
                     else:
 		        if (key[0:1] != '_') or (opts.has_key('verbose') and opts['verbose']): 
-                            print(" %s:%s," % (key, value), end="")
+                            fp.write(" %s:%s," % (key, value))
                 
-                print("")
+                fp.write("\n")
                 if opts.has_key('hexdump') and opts['hexdump']:
                     bitio.hexdump(chunk['_offset'], chunk['_length'])
 
