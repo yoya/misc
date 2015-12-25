@@ -1,21 +1,44 @@
 <?php
 
-//$imgfile = '/Users/yoya/Pictures/awmcorp_logo.png';
-//$width = 954;
-//$height = 1300;
-//$global_alpha = 0.5;
-//
-
-if ($argc != 5) {
-    echo "Usage: php makeHeaderImage.php <imgfile> <width> <height> <global_alpha>\n";
-    echo "Usage: php makeHeaderImage.php logo.png 954 1300 0.5\n";
-    exit (1);
+if (php_sapi_name() === 'cli') {
+    if ($argc != 5) {
+        echo "Usage: php makeHeaderImage.php <imgfile> <width> <height> <global_alpha>\n";
+        echo "Usage: php makeHeaderImage.php logo.png 954 1300 0.5\n";
+        exit (1);
+    }
+    list($prog, $imgfile, $width, $height, $global_alpha) = $argv;
+    
+    $imgdata = file_get_contents($imgfile);
+    makeHeaderImage($imgdata, $width, $height, $global_alpha);
+} else {
+    if (isset($_FILES['imgfile']) === false) {
+        echo <<< FORM_MESSAGE
+     <html>
+     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+     </head>
+     <body>
+        <form enctype="multipart/form-data" action="makeHeaderImage.php" method="POST">
+        <input type="hidden" name="MAX_FILE_SIZE" value="100000000" />
+        <!-- input 要素の名前が $_FILES 配列での名前となります -->
+        Wordpressヘッダ背景画像の元にする画像ファイルをアップロード: <input name="imgfile" type="file" />
+        <input type="submit" value="ファイル送信" />
+       </form>
+    <body>
+    <html>
+FORM_MESSAGE;
+    } else {
+        $imgfile = $_FILES['imgfile']['tmp_name'];
+        $imgdata = file_get_contents($imgfile);
+        header('Content-Type: image/png');
+	$width = 954;
+        $height = 1300;
+        $global_alpha = 0.5;
+        makeHeaderImage($imgdata, $width, $height, $global_alpha);
+    }
 }
-list($prog, $imgfile, $width, $height, $global_alpha) = $argv;
 
-$imgdata = file_get_contents($imgfile);
-header('Content-Type: image/png');
-makeHeaderImage($imgdata, $width, $height, $global_alpha);
+exit(0);
 
 function overlapimage($dst_im, $src_im, $x, $y, $size, $src_width, $src_height) {
     imagecopyresized($dst_im, $src_im,
