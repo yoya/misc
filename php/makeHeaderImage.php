@@ -52,16 +52,6 @@ function mt_rand_float($min, $max) {
     return $min + mt_rand(0, mt_getrandmax()) / mt_getrandmax() * $delta;
 }
 
-function mt_rand_float_leap($min, $max, $leap) {
-    $delta = $max - $min - $leap;
-    $r = mt_rand(0, mt_getrandmax()) / mt_getrandmax() * $delta;
-    if ($r < $delta / 2) {
-        return $min + $r;
-    } else {
-        return $min + $leap + $r;
-    }
-}
-
 function  conflict_draw_point($x, $y, $size) {
     global $draw_list;
     foreach ($draw_list as $draw_point) {
@@ -99,7 +89,6 @@ function makeHeaderImage($imgdata, $width, $height, $global_alpha) {
         foreach (range(0, $i*$i) as $j) {
             $length = mt_rand_float($distri * $distri * $distri * $distri , $distri);
             $radius = mt_rand_float(0, 3.14*2);
-            // var_dump(mt_rand_float_leap(-$distri, $distri, $distri/2));
             $x = $center_x * (1 + $length * cos($radius));
             $y = $center_y * (1 + $length * sin($radius));
             if (conflict_draw_point($x, $y, $size*0.7)) {
