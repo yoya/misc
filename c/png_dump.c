@@ -186,6 +186,10 @@ int main(int argc, char **argv) {
             printf("y=%lu: ", y);
             for (x=0; x < png_width; x++) {
                 switch(color_type) {
+                case PNG_COLOR_TYPE_GRAY:
+                    printf("%02x ",
+                           image_data[y][x]);
+                    break;
                 case PNG_COLOR_TYPE_RGB:
                     printf("%02x%02x%02x  ",
                            image_data[y][3*x],
