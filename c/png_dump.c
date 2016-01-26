@@ -102,8 +102,7 @@ int main(int argc, char **argv) {
                  NULL, NULL, NULL);
     printf("(width, height)=(%lu,%lu) bpp=%d",
            png_width, png_height, bpp);
-    printf(" color_type=");
-    printf("%d", color_type);
+    printf(" color_type=%d", color_type);
     switch(color_type) {
       case PNG_COLOR_TYPE_GRAY:
         printf("(GRAY)");
