@@ -105,19 +105,19 @@ int main(int argc, char **argv) {
     printf(" color_type=%d", color_type);
     switch(color_type) {
       case PNG_COLOR_TYPE_GRAY:
-        printf("(GRAY)");
-        break;
+	  printf("(GRAY)");
+	  break;
       case PNG_COLOR_TYPE_GRAY_ALPHA:
-        printf("(GRAY_ALPHA)");
-        break;
+	  printf("(GRAY_ALPHA)");
+	  break;
       case PNG_COLOR_TYPE_RGB:
-        printf("(RGB)");
-        break;
+	  printf("(RGB)");
+	  break;
       case PNG_COLOR_TYPE_RGB_ALPHA:
-        printf("(RGB_ALPHA)");
-        if (png_get_valid(png_ptr, png_info_ptr, PNG_INFO_tRNS))
-            png_set_tRNS_to_alpha(png_ptr);
-        break;
+	  printf("(RGB_ALPHA)");
+	  if (png_get_valid(png_ptr, png_info_ptr, PNG_INFO_tRNS))
+	      png_set_tRNS_to_alpha(png_ptr);
+	  break;
       case PNG_COLOR_TYPE_PALETTE:
           printf("(PALETTE)");
           png_get_PLTE(png_ptr, png_info_ptr, &palette, &palette_num);
@@ -131,8 +131,8 @@ int main(int argc, char **argv) {
           printf("  num_trans=%d\n", num_trans);
           break;
       default:
-           printf("color_type(%d) not implement yet.\n",
-                  color_type);
+	  printf("color_type(%d) not implement yet.\n",
+		 color_type);
     }
     printf("\n");
     /*
