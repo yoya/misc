@@ -1,3 +1,4 @@
+// 2016/10/27 (c)yoya@awm.jp
 // ref) https://github.com/yoya/IO_GIF/blob/master/IO/GIF.php
 
 package main
