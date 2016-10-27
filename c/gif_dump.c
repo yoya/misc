@@ -100,7 +100,11 @@ int main(int argc, char **argv) {
     /*
      * giflib
      */
+#if GIFLIB_MAJOR >= 5
+    GifFile = DGifOpen(& gif_buff, gif_data_read_func, NULL);
+#else
     GifFile = DGifOpen(& gif_buff, gif_data_read_func);
+#endif
     if (GifFile == NULL) {
         fprintf(stderr, "DGifOpen failed\n");
         return EXIT_FAILURE;
@@ -184,14 +188,22 @@ int main(int argc, char **argv) {
                         ColorMap = GifFile->SColorMap;
                     } else {
                         fprintf(stderr, "Not Found ColorMap\n");
+#if GIFLIB_MAJOR == 5 && GIFLIB_MINOR >= 1 || GIFLIB_MAJOR > 5
+                        DGifCloseFile(GifFile, NULL);
+#else
                         DGifCloseFile(GifFile);
+#endif
                         free(gif_buff.data);
                         return  EXIT_FAILURE;
                     }
                     if (ColorMap->ColorCount < transparent_index) {
                         fprintf(stderr, "ColorMap->ColorCount(%d) < transparent_index(%d)",
                                 ColorMap->ColorCount, transparent_index);
+#if GIFLIB_MAJOR == 5 && GIFLIB_MINOR >= 1 || GIFLIB_MAJOR > 5
+                        DGifCloseFile(GifFile, NULL);
+#else
                         DGifCloseFile(GifFile);
+#endif
                         free(gif_buff.data);
                         return  EXIT_FAILURE;
                     }
@@ -225,7 +237,11 @@ int main(int argc, char **argv) {
             printf("No RasterBits\n");
         }
     }
+#if GIFLIB_MAJOR == 5 && GIFLIB_MINOR >= 1 || GIFLIB_MAJOR > 5
+    DGifCloseFile(GifFile, NULL);
+#else
     DGifCloseFile(GifFile);
+#endif
     free(gif_buff.data);
     return EXIT_SUCCESS;
 }
