@@ -184,14 +184,14 @@ int main(int argc, char **argv) {
                         ColorMap = GifFile->SColorMap;
                     } else {
                         fprintf(stderr, "Not Found ColorMap\n");
-                        EGifCloseFile(GifFile);
+                        DGitCloseFile(GifFile);
                         free(gif_buff.data);
                         return  EXIT_FAILURE;
                     }
                     if (ColorMap->ColorCount < transparent_index) {
                         fprintf(stderr, "ColorMap->ColorCount(%d) < transparent_index(%d)",
                                 ColorMap->ColorCount, transparent_index);
-                        EGifCloseFile(GifFile);
+                        DGitCloseFile(GifFile);
                         free(gif_buff.data);
                         return  EXIT_FAILURE;
                     }
