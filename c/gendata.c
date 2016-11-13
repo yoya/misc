@@ -37,10 +37,10 @@ int main(int argc, char **argv) {
 			usage(program_name);
 			return 1;
 		}
-		for(i=0; i<argc-2; i++) {
+		dat_size = argc-2;
+		for(i=0; i<dat_size; i++) {
 			buf[i] = my_atoi(argv[2+i]);
 		}
-		dat_size = i;
 		/* no break; */
 		break;
 	}
