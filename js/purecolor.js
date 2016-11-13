@@ -39,12 +39,12 @@ var x = 0;
 for (var i = 0 ; i < 3 ; i++) {
     var [rgb1, rgb2, rgb3] = rgbRainbow.slice(i*2, i*2+3);
     drawLine(graphCtx, x, 1, x+widthUnit, 1, cssColor(rgb1));
-    drawLine(graphCtx, x, graph.height, x+widthUnit, 0, cssColor(rgb3));
+    drawLine(graphCtx, x, graph.height, x+widthUnit, 1, cssColor(rgb3));
     for (var j=0 ; j < widthUnit; j++, x++) {
 	var color = rgbMorph(rgb1, rgb2, j / widthUnit);
 	ribbonGrad.addColorStop(x/ribbon.width, cssColor(color));
     }
-    drawLine(graphCtx, x, 0, x+widthUnit, graph.height, cssColor(rgb1));
+    drawLine(graphCtx, x, 1, x+widthUnit, graph.height, cssColor(rgb1));
     drawLine(graphCtx, x, 1, x+widthUnit, 1, cssColor(rgb3));
     for (var j=0 ; j < widthUnit; j++, x++) {
 	var color = rgbMorph(rgb2, rgb3, j/ widthUnit);
