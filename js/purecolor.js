@@ -1,3 +1,6 @@
+/*
+ (c) 2016/11/13 - yoya@awm.jp
+*/
 function cssColor(r,g,b) { return "rgb("+r+","+g+","+b+")"; }
 function drawLine(ctx, x1, y1, x2, y2, color) {
     ctx.strokeWidth=1;
