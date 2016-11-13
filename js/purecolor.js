@@ -23,16 +23,17 @@ function drawLine(ctx, x1, y1, x2, y2, color) {
     ctx.stroke();
 }
 
+var rgbRainbow = [[255, 0, 0], [255, 255, 0], [0, 255, 0], [0, 255, 255], [0, 0, 255], [255, 0, 255], [255, 0, 0]];
+var widthUnit = 256;
+
 var ribbon = document.getElementById("ribbon");
 var graph  = document.getElementById("graph");
 var ribbonCtx = ribbon.getContext("2d");
 var graphCtx  = graph.getContext("2d");
+ribbon.width = graph.width = widthUnit * 6;
 graphCtx.globalCompositeOperation = "lighter";
 
 var ribbonGrad = ribbonCtx.createLinearGradient(0, 0, ribbon.width, 0);
-
-var rgbRainbow = [[255, 0, 0], [255, 255, 0], [0, 255, 0], [0, 255, 255], [0, 0, 255], [255, 0, 255], [255, 0, 0]];
-var widthUnit = 256;
 
 var x = 0;
 for (var i = 0 ; i < 3 ; i++) {
