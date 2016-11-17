@@ -52,7 +52,6 @@ for ($i = 0 ; true ; $i++) {
         }
     }
     if (! $iendFound) {
-        echo "OK";
         break;
     }
     $outputdata = substr($data, $startOffset, $offset - $startOffset);
@@ -61,5 +60,7 @@ for ($i = 0 ; true ; $i++) {
     file_put_contents($outputFilename, $outputdata);
     $offset += strlen($outputdata);
 }
+
+echo "OK";
 
 exit(0);
