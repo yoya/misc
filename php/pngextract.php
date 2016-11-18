@@ -43,9 +43,9 @@ for ($i = 0 ; true ; $i++) {
     $iendFound = false;
     while (($offset + 8) < $dataLen) {
         $len = readUI32($data, $offset);
-        $sig = substr($data, $offset + 4 , 4);
-        $offset += 4 + 4 + $len + 4; // len + sig + <payload> + crc
-        if ($sig === "IEND") {
+        $name = substr($data, $offset + 4 , 4);
+        $offset += 4 + 4 + $len + 4; // len + name + <payload> + crc
+        if ($name === "IEND") {
             $iendFound = true;
             break;
         }
