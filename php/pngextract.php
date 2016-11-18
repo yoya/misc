@@ -32,9 +32,8 @@ function readUI32($data, $offset) { //BigEndian
 
 $data = file_get_contents($file);
 $dataLen = strlen($data);
-$offset = 0;
-$i = 0;
 
+$offset = 0;
 for ($i = 0 ; true ; $i++) {
     $startOffset = strpos($data, $pngSignature, $offset);
     if ($startOffset === false) {
@@ -52,6 +51,7 @@ for ($i = 0 ; true ; $i++) {
         }
     }
     if (! $iendFound) {
+        echo "Incomplete PNG file found (offset:$offset)\n";
         break;
     }
     $outputdata = substr($data, $startOffset, $offset - $startOffset);
@@ -61,6 +61,6 @@ for ($i = 0 ; true ; $i++) {
     $offset += strlen($outputdata);
 }
 
-echo "OK";
+echo "OK\n";
 
 exit(0);
