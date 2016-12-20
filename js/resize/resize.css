@@ -1,0 +1,30 @@
+
+/* abstruct define */
+
+.noCR {
+  display: inline-block; // IE
+  _display: inline;      // Mozilla
+}
+.yesCR {
+  display: block; // IE
+  _display: block;      // Mozilla
+}
+
+/* area define */
+body {
+   background-color: #eff;
+}
+#graphCanvas {
+     background-color: white;
+}
+#srcCanvas {
+     background-color: black;
+}
+#dstCanvas {
+     background-color: black;
+}
+#workspace {
+    position:relative;
+    width: 100%;
+    height: 100%;
+}
