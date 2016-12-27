@@ -1,3 +1,5 @@
+"use strict";
+
 function cubicBCcoefficient(b, c) {
     var p = 12 - 9 * b - 6 * c;
     var q = -18 + 12 * b + 6 * c;

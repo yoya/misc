@@ -1,3 +1,5 @@
+"use strict";
+
 function selectBinding(valueTable, id) {
     var elem = getById(id);
     if (! elem) {
