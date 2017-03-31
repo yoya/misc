@@ -1,3 +1,4 @@
+"use strict";
 // require func.js
 
 function cssColor(r,g,b) { return "rgb("+r+","+g+","+b+")"; }

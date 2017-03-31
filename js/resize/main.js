@@ -1,4 +1,6 @@
-// require parameter.js
+"use strict";
+// require func.js
+// require bind.js
 // require graph.js
 // require image.js
 
@@ -12,13 +14,13 @@ function main() {
 			     "cubicB":"direct", "cubicC":"direct",
 			     "lobe":"direct"};
     var valueTable = {};
-    for (id in selectBindingList) {
-	type = selectBindingList[id];
+    for (var id in selectBindingList) {
+	var type = selectBindingList[id];
 	selectBinding(valueTable, id);
 	valueTable[id] = getById(id).value;
     }
-    for (id in rangeBindingList) {
-	type = rangeBindingList[id];
+    for (var id in rangeBindingList) {
+	var type = rangeBindingList[id];
 	rangeBinding(valueTable, id, type);
 	var value = getById(id+"Value").value;
 	valueTable[id] = value;
@@ -30,6 +32,8 @@ function main() {
 function update(valueTable, heavy) {
     drawGraph(valueTable);
     if (heavy) {
-	// resize
+	var srcCanvas = getById("srcCanvas");
+	var dstCanvas = getById("dstCanvas");
+	resizeFunc(srcCanvas, dstCanvas, valueTable);
     }
 }
