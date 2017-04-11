@@ -9,7 +9,7 @@ $prev_c = null;
 
 $cr = false;
 
-$text .= "<<";
+$text .= "<<".PHP_EOL;
 
 while (($c = fgetc($fp)) !== false) {
     if ($c === "\n") {
