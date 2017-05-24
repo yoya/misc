@@ -55,7 +55,7 @@ if ($fp === false) {
 
 $offset = 0;
 for ($i = 0 ; searchText($fp, $jpegSOI) !== false; $i++) {
-    $jpegdata = searchText($fp, $jpegEOF);
+    $jpegdata = searchText($fp, $jpegEOI);
     if ($jpegdata === false) {
         echo "JPEG SOI(FFF8) found, but EOF(FFF9) not found\n";
         return ;
@@ -63,6 +63,7 @@ for ($i = 0 ; searchText($fp, $jpegSOI) !== false; $i++) {
     $outputFilename = sprintf("%s%06d.jpg", $prefix, $i);
     echo "$outputFilename\n";
     $fp_out = fopen($outputFilename, "wb");
+    fwrite($fp_out, $jpegSOI . $jpegdata);
     fclose($fp_out);
 }
 
