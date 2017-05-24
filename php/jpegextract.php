@@ -57,6 +57,7 @@ $offset = 0;
 for ($i = 0 ; searchText($fp, $jpegSOI) !== false; $i++) {
     $jpegdata = searchText($fp, $jpegEOF);
     if ($jpegdata === false) {
+        echo "JPEG SOI(FFF8) found, but EOF(FFF9) not found\n";
         return ;
     }
     $outputFilename = sprintf("%s%06d.jpg", $prefix, $i);
