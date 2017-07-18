@@ -212,6 +212,10 @@ int main(int argc, char **argv) {
                     printf("%02x ",
                            image_data[y][x]);
                     break;
+                case PNG_COLOR_TYPE_GRAY_ALPHA:
+                    printf("%02x(%02x) ",
+                           image_data[y][2*x], image_data[y][2*x+1]);
+                    break;
                 case PNG_COLOR_TYPE_RGB:
                     printf("%02x%02x%02x  ",
                            image_data[y][3*x],
