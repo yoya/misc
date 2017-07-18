@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
     png_structp png_ptr = png_create_read_struct
         (PNG_LIBPNG_VER_STRING, NULL,NULL,NULL);
     if (! png_ptr) {
-        fprintf(stderr, "can't create read_struct\n");
+      fprintf(stderr, "can't create read_struct\n");
         free(png_buff.data);
         return EXIT_FAILURE;
     }
@@ -151,6 +151,13 @@ int main(int argc, char **argv) {
                   color_type);
     }
     printf("\n");
+    /*
+      meta data
+    */
+    double file_gamma;
+    if (png_get_gAMA(png_ptr, png_info_ptr, &file_gamma)) {
+      printf("gamma: %f\n", file_gamma);
+    }
     /*
       image
      */
