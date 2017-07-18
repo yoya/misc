@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> // memcpy
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -24,7 +25,7 @@ void png_data_read_func(png_structp png_ptr, png_bytep buf, png_size_t size){
         memcpy(buf, png_buff->data + png_buff->data_offset, size);
         png_buff->data_offset += size;
     } else {
-        fprintf(stderr, "! png_buff->data_offset(%lu) + size(%d) <= png_buff->data_len(%lu)\n",
+        fprintf(stderr, "! png_buff->data_offset(%lu) + size(%lu) <= png_buff->data_len(%lu)\n",
                 png_buff->data_offset, size, png_buff->data_len);
         png_error(png_ptr,"png_read_read_func failed");
     }
@@ -100,7 +101,7 @@ int main(int argc, char **argv) {
     png_get_IHDR(png_ptr, png_info_ptr,
                  &png_width, &png_height, &bpp, &color_type,
                  NULL, NULL, NULL);
-    printf("(width, height)=(%lu,%lu) bpp=%d",
+    printf("(width, height)=(%u,%u) bpp=%d",
            png_width, png_height, bpp);
     printf(" color_type=%d", color_type);
     switch(color_type) {
@@ -187,7 +188,7 @@ int main(int argc, char **argv) {
             unsigned char *linedata = image_data[y];
             bitstream_t *bs = bitstream_open();
             bitstream_input(bs, linedata, png_get_rowbytes(png_ptr, png_info_ptr));
-            printf("y=%lu: ", y);
+            printf("y=%u: ", y);
             for (x=0; x < png_width; x++) {
                 int colorindex = bitstream_getbits(bs, bpp);
                 printf("%02x  ", colorindex);
@@ -197,7 +198,7 @@ int main(int argc, char **argv) {
         }
     } else {
         for (y=0; y < png_height; y++) {
-            printf("y=%lu: ", y);
+            printf("y=%u: ", y);
             for (x=0; x < png_width; x++) {
                 switch(color_type) {
                 case PNG_COLOR_TYPE_GRAY:
