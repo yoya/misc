@@ -1,7 +1,7 @@
 /*
   (c) 2017/07/20 yoya@awm.jp
   ref) https://github.com/yoya/misc/blob/master/c/png_dump.c
- */
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,17 +13,14 @@
 int main(int argc, char **argv) {
     char *png_filename = NULL;
     FILE *fp = NULL;
-    int is_png;
     png_uint_32 png_width, png_height;
     int bpp, color_type;
-    png_bytepp image_data;
-    png_uint_32 x, y;
+    png_bytep image_data;
     png_color *palette = NULL;
     int palette_num = 0;
     png_bytep trans = NULL;
     int num_trans;
     png_color_16p trans_values = NULL;
-    int palette_dump_unit;
     double file_gamma;
 	
     if (argc != 2) {
@@ -32,14 +29,15 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
     png_filename = argv[1];
-//    printf("png_filename=%s\n", png_filename);
     fp = fopen(png_filename, "rb");
     if (! fp) {
         fprintf(stderr, "Can't open file(%s)\n", png_filename);
         return EXIT_FAILURE;
     }
 
-    // reader
+    /*
+     * png reader setup
+     */
     png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL,NULL,NULL);
     if (! png_ptr) {
       fprintf(stderr, "can't create read_struct\n");
@@ -51,18 +49,23 @@ int main(int argc, char **argv) {
         png_destroy_read_struct (&png_ptr, NULL, NULL);
         return EXIT_FAILURE;
     }
-    // writer
-    png_structp png_write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL,NULL,NULL);
-
     png_init_io(png_ptr, fp);
-    png_init_io(png_write_ptr, stdout);
-    
-    png_read_info(png_ptr, png_info_ptr);
+    image_data = (png_bytep) malloc(png_get_rowbytes(png_ptr, png_info_ptr));
 
     /*
-     * reading
+     * png writer setup
      */
-    
+    png_structp png_write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL,NULL,NULL);
+    if (! png_write_ptr) {
+      fprintf(stderr, "can't create write_struct\n");
+        return EXIT_FAILURE;
+    }
+    png_init_io(png_write_ptr, stdout);
+
+    /*
+     * metadata reading
+     */
+    png_read_info(png_ptr, png_info_ptr);
     png_get_IHDR(png_ptr, png_info_ptr,
                  &png_width, &png_height, &bpp, &color_type,
                  NULL, NULL, NULL);
@@ -72,19 +75,10 @@ int main(int argc, char **argv) {
     png_get_tRNS(png_ptr, png_info_ptr, &trans, &num_trans, &trans_values);
     png_get_PLTE(png_ptr, png_info_ptr, &palette, &palette_num);
     png_get_gAMA(png_ptr, png_info_ptr, &file_gamma);
-
-    image_data = (png_bytepp) malloc(png_height * sizeof(png_bytep));
-    for (y=0; y < png_height; y++) {
-      image_data[y] = (png_bytep) malloc(png_get_rowbytes(png_ptr, png_info_ptr));
-    }
-    png_read_image(png_ptr, image_data);
+    // TODO: cHRM, bKGD, tIME, tEXt
 
     /*
-     * edit something here.
-     */
-
-    /*
-     * set meta information
+     * metadata setting.
      */
     if (png_get_valid(png_ptr, png_info_ptr, PNG_INFO_tRNS)) {
       png_set_tRNS(png_write_ptr, png_info_ptr, trans, num_trans,
@@ -99,18 +93,22 @@ int main(int argc, char **argv) {
     }
 
     /*
-     * writing
+     * writing, image read & write each line.
      */
     png_write_info(png_write_ptr, png_info_ptr);
-    png_write_image(png_write_ptr, image_data);
+
+    int pass = png_set_interlace_handling(png_ptr);
+    for (int p = 0 ; p < pass ; p++) {
+      for (png_uint_32 y = 0 ; y < png_height ; y++) {
+	png_read_row(png_ptr, image_data, NULL);
+	png_write_row(png_write_ptr, image_data);
+      }
+    }
     png_write_end(png_write_ptr, png_info_ptr);
 
     /*
      * finish
      */
-    for (y=0; y < png_height; y++) {
-        free(image_data[y]);
-    }
     free(image_data);
     png_destroy_read_struct(&png_ptr, &png_info_ptr, NULL);
     png_destroy_write_struct(&png_write_ptr, NULL);
