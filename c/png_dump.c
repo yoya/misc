@@ -1,7 +1,10 @@
 /*
-  http://www.libpng.org/pub/png/libpng-1.2.5-manual.html
-  http://www5.cds.ne.jp/~kato/png/
-  http://www.amy.hi-ho.ne.jp/jbaba/png2dib.c
+  (c) yoya@awm.jp 2010/10/01-
+  libpng sample in memory processing.
+  ref) 
+  - http://www.libpng.org/pub/png/libpng-1.2.5-manual.html
+  - http://www5.cds.ne.jp/~kato/png/
+  - http://www.amy.hi-ho.ne.jp/jbaba/png2dib.c
  */
 
 #include <stdio.h>
