@@ -15,14 +15,16 @@ int main(int argc, char **argv) {
     FILE *fp = NULL;
     png_uint_32 png_width, png_height;
     int bpp, color_type;
-    png_bytep image_data;
+    int interlace, comptype, filtertype;
+    png_bytepp image_data;
+    png_uint_32 y;
     png_color *palette = NULL;
     int palette_num = 0;
     png_bytep trans = NULL;
     int num_trans;
     png_color_16p trans_values = NULL;
     double file_gamma;
-	
+    int pass; // interlace pass phase
     if (argc != 2) {
         char *program_filename = argv[0];
         fprintf(stderr, "Usage: %s <png_filename>\n", program_filename);
@@ -50,7 +52,6 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
     png_init_io(png_ptr, fp);
-    image_data = (png_bytep) malloc(png_get_rowbytes(png_ptr, png_info_ptr));
 
     /*
      * png writer setup
@@ -68,9 +69,14 @@ int main(int argc, char **argv) {
     png_read_info(png_ptr, png_info_ptr);
     png_get_IHDR(png_ptr, png_info_ptr,
                  &png_width, &png_height, &bpp, &color_type,
-                 NULL, NULL, NULL);
+                 &interlace, &comptype, &filtertype);
     // printf("(width, height)=(%u,%u) bpp=%d", png_width, png_height, bpp);
     // printf(" color_type=%d", color_type);
+
+    image_data = (png_bytepp) malloc(png_height * sizeof(png_bytep));
+    for (y=0; y < png_height; y++) {
+      image_data[y] = (png_bytep) malloc(png_get_rowbytes(png_ptr, png_info_ptr));
+    }
 
     png_get_tRNS(png_ptr, png_info_ptr, &trans, &num_trans, &trans_values);
     png_get_PLTE(png_ptr, png_info_ptr, &palette, &palette_num);
@@ -78,8 +84,24 @@ int main(int argc, char **argv) {
     // TODO: cHRM, bKGD, tIME, tEXt
 
     /*
+     * read image
+     */
+    pass = png_set_interlace_handling(png_ptr);
+    // fprintf(stderr, "pass:%d\n", pass);
+    for (int p = 0 ; p < pass ; p++) {
+      for (y = 0 ; y < png_height ; y++) {
+	png_read_row(png_ptr, image_data[y], NULL);
+      }
+    }
+
+    /*
      * metadata setting.
      */
+    png_write_info(png_write_ptr, png_info_ptr);
+    png_set_IHDR(png_write_ptr, png_info_ptr,
+                 png_width, png_height, bpp, color_type,
+                 interlace, comptype, filtertype);
+
     if (png_get_valid(png_ptr, png_info_ptr, PNG_INFO_tRNS)) {
       png_set_tRNS(png_write_ptr, png_info_ptr, trans, num_trans,
 		   trans_values);
@@ -93,15 +115,13 @@ int main(int argc, char **argv) {
     }
 
     /*
-     * writing, image read & write each line.
+     * image writing
      */
-    png_write_info(png_write_ptr, png_info_ptr);
-
-    int pass = png_set_interlace_handling(png_ptr);
+    pass = png_set_interlace_handling(png_write_ptr);
+    // fprintf(stderr, "pass(write):%d\n", pass);
     for (int p = 0 ; p < pass ; p++) {
-      for (png_uint_32 y = 0 ; y < png_height ; y++) {
-	png_read_row(png_ptr, image_data, NULL);
-	png_write_row(png_write_ptr, image_data);
+      for (y = 0 ; y < png_height ; y++) {
+	  png_write_row(png_write_ptr, image_data[y]);
       }
     }
     png_write_end(png_write_ptr, png_info_ptr);
@@ -109,7 +129,7 @@ int main(int argc, char **argv) {
     /*
      * finish
      */
-    free(image_data);
+    // free(image_data);
     png_destroy_read_struct(&png_ptr, &png_info_ptr, NULL);
     png_destroy_write_struct(&png_write_ptr, NULL);
     return EXIT_SUCCESS;
