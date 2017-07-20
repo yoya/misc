@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     png_uint_32 png_width, png_height;
     int bpp, color_type;
     int interlace, comptype, filtertype;
-    png_bytepp image_data;
+    png_bytep image_data;
     png_uint_32 y;
     png_color *palette = NULL;
     int palette_num = 0;
@@ -73,26 +73,12 @@ int main(int argc, char **argv) {
     // printf("(width, height)=(%u,%u) bpp=%d", png_width, png_height, bpp);
     // printf(" color_type=%d", color_type);
 
-    image_data = (png_bytepp) malloc(png_height * sizeof(png_bytep));
-    for (y=0; y < png_height; y++) {
-      image_data[y] = (png_bytep) malloc(png_get_rowbytes(png_ptr, png_info_ptr));
-    }
+    image_data = (png_bytep) malloc(png_get_rowbytes(png_ptr, png_info_ptr));
 
     png_get_tRNS(png_ptr, png_info_ptr, &trans, &num_trans, &trans_values);
     png_get_PLTE(png_ptr, png_info_ptr, &palette, &palette_num);
     png_get_gAMA(png_ptr, png_info_ptr, &file_gamma);
     // TODO: cHRM, bKGD, tIME, tEXt
-
-    /*
-     * read image
-     */
-    pass = png_set_interlace_handling(png_ptr);
-    // fprintf(stderr, "pass:%d\n", pass);
-    for (int p = 0 ; p < pass ; p++) {
-      for (y = 0 ; y < png_height ; y++) {
-	png_read_row(png_ptr, image_data[y], NULL);
-      }
-    }
 
     /*
      * metadata setting.
@@ -115,13 +101,16 @@ int main(int argc, char **argv) {
     }
 
     /*
-     * image writing
+     * image read & writing each line
      */
+
+    pass = png_set_interlace_handling(png_ptr);
     pass = png_set_interlace_handling(png_write_ptr);
-    // fprintf(stderr, "pass(write):%d\n", pass);
+    // fprintf(stderr, "pass:%d\n", pass);
     for (int p = 0 ; p < pass ; p++) {
       for (y = 0 ; y < png_height ; y++) {
-	  png_write_row(png_write_ptr, image_data[y]);
+	png_read_row(png_ptr, image_data, NULL);
+	png_write_row(png_write_ptr, image_data);
       }
     }
     png_write_end(png_write_ptr, png_info_ptr);
@@ -129,7 +118,7 @@ int main(int argc, char **argv) {
     /*
      * finish
      */
-    // free(image_data);
+    free(image_data);
     png_destroy_read_struct(&png_ptr, &png_info_ptr, NULL);
     png_destroy_write_struct(&png_write_ptr, NULL);
     return EXIT_SUCCESS;
