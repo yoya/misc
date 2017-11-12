@@ -38,6 +38,13 @@ char * string_J_DCT_METHOD(J_DCT_METHOD method) {
     }
     return "(Wrong)";
 } 
+char * string_J_COLOR_TRANSFORM(J_COLOR_TRANSFORM transform) {
+    switch(transform) {
+    case JCT_NONE:           return "JCT_NONE";;
+    case JCT_SUBTRACT_GREEN: return "JCT_SUBTRACT_GREEN";
+    }
+    return "(Wrong)";
+} 
 
 
 void dump_jpeg_dinfo(struct jpeg_decompress_struct *dinfo) {
@@ -123,7 +130,25 @@ void dump_jpeg_dinfo(struct jpeg_decompress_struct *dinfo) {
 	printf("        Adobe_transform:%d\n",
 	       dinfo->Adobe_transform);
     }
+    printf("--- derived from LSE marker, otherwise zero\n");
+    printf("    color_transform:%d(%s)\n",
+	   dinfo->color_transform,
+	   string_J_COLOR_TRANSFORM(dinfo->color_transform));
+    printf("--- TRUE=first samples are cosited\n");
+    printf("    CCIR601_sampling:%d\n", dinfo->CCIR601_sampling);
 
+    // APPn markers
+    // marker_list
+
+    printf("--- computed during decompression startup\n");
+    printf("    max_(h|v)_samp_factor:(%d,%d) min_DCT_(h|v)_scaled_size:(%d,%d)\n",
+	   dinfo->max_h_samp_factor, dinfo->max_v_samp_factor,
+	   dinfo->min_DCT_h_scaled_size, dinfo->min_DCT_v_scaled_size);
+    printf("--- of iMCU rows in image\n");
+    printf("    total_iMCU_rows:%d\n",
+	   dinfo->total_iMCU_rows);
+    
+	
     /*
     printf("    :%d\n",
 	   );
