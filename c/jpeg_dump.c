@@ -56,7 +56,7 @@ void dump_jpeg_dinfo(struct jpeg_decompress_struct *dinfo) {
 	   dinfo->out_color_space,
 	   string_J_COLOR_SPACE(dinfo->out_color_space),
 	   dinfo->scale_num, dinfo->scale_denom, dinfo->output_gamma);
-    printf("    buffered_image:%d raw_data_out:%d \n",
+    printf("    buffered_image:%d raw_data_out:%d\n",
 	   dinfo->buffered_image, dinfo->raw_data_out);
     printf("    dct_method:%d(%s) do_fancy_upsampling:%d do_block_smoothing:%d\n",
 	   dinfo->dct_method, string_J_DCT_METHOD(dinfo->dct_method),
@@ -74,12 +74,12 @@ void dump_jpeg_dinfo(struct jpeg_decompress_struct *dinfo) {
     }
 
     printf("--- computed by jpeg_start_decompress\n");
-    printf("    output_width:%d output_height:%d out_color_components:%d output_components:%d \n",
+    printf("    output_width:%d output_height:%d out_color_components:%d output_components:%d\n",
 	   dinfo->output_width, dinfo->output_height,
 	   dinfo->out_color_components, dinfo->output_components);
-    printf("    rec_outbuf_height:%d \n",
+    printf("    rec_outbuf_height:%d\n",
 	   dinfo->rec_outbuf_height);
-    printf("    actual_number_of_colors:%d \n",
+    printf("    actual_number_of_colors:%d\n",
 	   dinfo->actual_number_of_colors);
     // colormap;
     printf("--- Row index of next scanline\n");
@@ -95,7 +95,7 @@ void dump_jpeg_dinfo(struct jpeg_decompress_struct *dinfo) {
     // dc_huff_tbl_ptrs,  ac_huff_tbl_ptrs
     printf("--- given in SOF/SOS , reset by SOI\n");
 
-    printf("    data_precision:%d \n",
+    printf("    data_precision:%d\n",
 	   dinfo->data_precision);
     if (dinfo->comp_info) {
 	int i;
@@ -107,10 +107,10 @@ void dump_jpeg_dinfo(struct jpeg_decompress_struct *dinfo) {
 	   dinfo->is_baseline, dinfo->progressive_mode,
 	   dinfo->arith_code);
     // arith_dc_L, arith_dc_U, arith_ac_K
-    printf("    restart_interval:%d \n", dinfo->restart_interval);
+    printf("    restart_interval:%d\n", dinfo->restart_interval);
     printf("--- optional markers\n");
     /*
-    printf("    :%d \n",
+    printf("    :%d\n",
 	   );
 
     */
