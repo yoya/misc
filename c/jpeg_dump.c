@@ -109,6 +109,21 @@ void dump_jpeg_dinfo(struct jpeg_decompress_struct *dinfo) {
     // arith_dc_L, arith_dc_U, arith_ac_K
     printf("    restart_interval:%d\n", dinfo->restart_interval);
     printf("--- optional markers\n");
+    printf("    saw_JFIF_marker:%d\n", dinfo->saw_JFIF_marker);
+    if (dinfo->saw_JFIF_marker) {
+	printf("        JFIF_(major|minor)_version:(%d,%d)\n",
+	       dinfo->JFIF_major_version, dinfo->JFIF_minor_version
+	   );
+	printf("        density_unit:%d (X|Y)_density:(%d,%d)\n",
+	       dinfo->density_unit, dinfo->X_density, dinfo->Y_density);
+    }
+    printf("    saw_Adobe_marker:%d\n",
+	   dinfo->saw_Adobe_marker);
+    if (dinfo->saw_Adobe_marker) {
+	printf("        Adobe_transform:%d\n",
+	       dinfo->Adobe_transform);
+    }
+
     /*
     printf("    :%d\n",
 	   );
