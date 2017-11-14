@@ -147,8 +147,7 @@ void dump_jpeg_dinfo(struct jpeg_decompress_struct *dinfo) {
     printf("--- of iMCU rows in image\n");
     printf("    total_iMCU_rows:%d\n",
 	   dinfo->total_iMCU_rows);
-    
-	
+
     /*
     printf("    :%d\n",
 	   );
@@ -161,11 +160,34 @@ void dump_jpeg_component_info(jpeg_component_info *comp_info, int info_index) {
     printf("    comp_info[%d]:\n", info_index);
     printf("        component_id:%d component_index:%d\n",
 	   info->component_id, info->component_index);
-    printf("        {h|v}_samp_factor:{%d, %d}\n",
-	   info->h_samp_factor, info->v_samp_factor);
-    //
-    printf("        downsampled_{width|height}:{%d, %d}\n",
+    printf("        {h|v}_samp_factor:(%d, %d) quant_tbl_no:%d\n",
+	   info->h_samp_factor, info->v_samp_factor, info->quant_tbl_no);
+    printf("    --- may vary between scans.\n");
+    printf("        dc_tbl_no:%d ac_tbl_no:%d\n",
+	   info->dc_tbl_no, info->ac_tbl_no);
+    printf("    --- computed during compression or decompression startup\n");
+    printf("        (width|height)_in_blocks:(%d, %d)\n",
+	   info->width_in_blocks, info->height_in_blocks);
+    printf("    --- reflecting any scaling we choose to apply during the DCT step.\n");
+    printf("        DCT_(h|v)_scaled_size:(%d,%d)\n",
+	   info->DCT_h_scaled_size,  info->DCT_v_scaled_size);
+
+    printf("        downsampled_(width,height):(%d,%d)\n",
 	   info->downsampled_width, info->downsampled_height);
+    printf("        component_needed:%d\n", info->component_needed);
+    printf("    --- computed before starting a scan of the component\n");
+    printf("        MCU_(width|height|blocks|sample_width):(%d,%d,%d,%d)\n",
+	   info->MCU_width, info->MCU_height,
+	   info->MCU_blocks, info->MCU_sample_width);
+    printf("        last_(col|row)_width:(%d,%d)\n",
+	   info->last_col_width, info->last_row_height);
+    printf("    --- used only for decompression\n");
+    printf("        quant_table:%p\n",
+	   info->quant_table);
+    printf("    --- Private per-component storage for DCT or IDCT subsystem.\n");
+    printf("        dct_table:%p\n",
+	   info->dct_table);
+
 }
 
 int main(int argc, char **argv) {
