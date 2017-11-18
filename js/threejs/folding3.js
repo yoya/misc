@@ -21,13 +21,6 @@ document.addEventListener("drop" , function(e) {
 	    var dataURL = e.target.result;
             var image = new Image();
             image.onload = function() {
-		var canvas = document.createElement("canvas");
-		canvas.width = image.width;
-		canvas.height = image.height;
-		var ctx = canvas.getContext("2d");
-		ctx.drawImage(image, 0, 0, image.width, image.height,
-			      0, 0, canvas.width, canvas.height);
-		//var texture = new THREE.Texture(canvas);
 		var texture = new THREE.Texture(image);
 		texture.needsUpdate = true;
 		// console.log(camera.position);
@@ -55,6 +48,7 @@ function init() {
     var geometry = new THREE.PlaneGeometry( 2, 1, 3, 1);
     var geometry_back = new THREE.PlaneGeometry( 2, 1, 3, 1);
     console.log(geometry.vertices);
+    // folding geometry
     geometry.vertices[0].x = geometry.vertices[4].x = -0.5;
     geometry.vertices[0].z = geometry.vertices[4].z = 0.5;
     geometry.vertices[3].x = geometry.vertices[7].x = 0.5;
@@ -76,8 +70,7 @@ function init() {
 	scene.add( new THREE.Mesh( geometry_back, material_back) );
     });
 
-    //
-    renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+    renderer = new THREE.WebGLRenderer( { antialias: false, alpha: true } );
     renderer.setClearColor( 0x000000, 0 );
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
@@ -88,4 +81,3 @@ function animate() {
 	requestAnimationFrame( animate );
 	renderer.render( scene, camera );
 }
-

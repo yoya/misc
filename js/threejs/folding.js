@@ -13,6 +13,7 @@ function init() {
     var geometry = new THREE.PlaneGeometry( 2, 1, 2, 1);
     var geometry_back = new THREE.PlaneGeometry( 2, 1, 2, 1);
     console.log(geometry.vertices);
+    // folding geometry
     geometry.vertices[0].x = geometry.vertices[3].x = -0.5;
     geometry.vertices[0].z = geometry.vertices[3].z = 0.5;
     geometry.vertices[2].x = geometry.vertices[5].x = 0.5;
@@ -32,7 +33,7 @@ function init() {
     scene.add( new THREE.Mesh( geometry_back, material) );
     
     //
-    renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+    renderer = new THREE.WebGLRenderer( { antialias: false, alpha: true } );
     renderer.setClearColor( 0x000000, 0 );
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
