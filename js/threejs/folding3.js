@@ -1,13 +1,138 @@
 "use strict";
 var camera, scene, renderer;
-var material, material_back;
+var geometry, geometry_back;
+var map = null, map_back;
+var material,material_back;
+var mesh = null, mesh_back;
+
+var foldingTypeSelect = document.getElementById("foldingTypeSelect");
+var reverseDirectionSelect = document.getElementById("reverseDirectionSelect");
 
 init();
+updateTexture();
 animate();
 
+function init() {
+    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+    camera.position.z = 1.5;
+    scene = new THREE.Scene();
+    scene.add( new THREE.AxesHelper(100) );
+    
+    var canvas = document.getElementById("canvas3d");
+    var [windowWidth, windowHeight] = [window.innerWidth, window.innerHeight]
+    var aspect = 1.3;
+    if (windowWidth  >  (windowHeight * aspect))  {
+	canvas.width = windowHeight *  aspect;
+	canvas.height = windowHeight;
+    } else {
+	canvas.width = windowWidth;
+	canvas.height = windowWidth / aspect;
+    }
+    renderer = new THREE.WebGLRenderer( { canvas:canvas, antialias: false } );
+    // renderer.setClearColor( 0x000000, 0 );
+    // document.body.appendChild( renderer.domElement );
+    new THREE.OrbitControls( camera, renderer.domElement );
+}
+
+function updateTexture() {
+    var foldingType = foldingTypeSelect.value;
+    var reverseDirection = reverseDirectionSelect.value;
+    console.log("updateTexture("+foldingType+","+reverseDirection+")");
+    if (mesh) {
+	scene.remove( mesh );
+	material.dispose();
+	// map.dispose();
+	geometry.dispose();
+	scene.remove( mesh_back );
+	material_back.dispose();
+	// map_back.dispose();
+	geometry_back.dispose();
+    }
+    if (foldingType === undefined) {
+	foldingType = "fold3curl";
+    }
+    var [planeRows, planeCols] = [1, 1]
+    if (foldingType === "fold2") {
+	[planeRows, planeCols] = [2, 1];
+    } else {
+	[planeRows, planeCols] = [3, 1];
+    }
+    geometry = new THREE.PlaneGeometry( 2, 1, planeRows, planeCols );
+    geometry_back = new THREE.PlaneGeometry( 2, 1, planeRows, planeCols );
+    console.log(geometry.vertices);
+    // folding geometry
+    if (foldingType === "fold2") {
+	geometry.vertices[0].x = geometry.vertices[3].x = -0.5;
+	geometry.vertices[0].z = geometry.vertices[3].z = 0.5;
+	geometry.vertices[2].x = geometry.vertices[5].x = 0.5;
+	geometry.vertices[2].z = geometry.vertices[5].z = 0.5;
+    } else if (foldingType === "fold3curl") {
+	geometry.vertices[0].x = geometry.vertices[4].x = -0.5;
+	geometry.vertices[0].z = geometry.vertices[4].z = 0.5;
+	geometry.vertices[3].x = geometry.vertices[7].x = 0.5;
+	geometry.vertices[3].z = geometry.vertices[7].z = 0.5;
+    } else {
+	geometry.vertices[0].x = geometry.vertices[4].x = -0.5;
+	geometry.vertices[0].z = geometry.vertices[4].z = 0.5;
+	geometry.vertices[3].x = geometry.vertices[7].x = 0.5;
+	geometry.vertices[3].z = geometry.vertices[7].z = -0.5;
+    }
+    // reverse geometry
+    if (reverseDirection === "horizontal") {
+	for (var i = 0, l = geometry.vertices.length ; i < l/2; i++) {
+	    geometry_back.vertices[      i] = geometry.vertices[l/2 - i - 1];
+	    geometry_back.vertices[l/2 + i] = geometry.vertices[l   - i - 1];
+	}
+    } else {
+	for (var i = 0, l = geometry.vertices.length ; i < l/2; i++) {
+	    geometry_back.vertices[i] = geometry.vertices[l/2 + i];
+	    geometry_back.vertices[l/2 + i] = geometry.vertices[i];
+	}
+    }
+    
+    if (map === null) {
+	var texLoader = new THREE.TextureLoader();
+	texLoader.load('front.jpg', function(texture) { // onload
+	    console.log("map", map);
+	    map = texture;
+	    material = new THREE.MeshBasicMaterial( { map: map } )
+	    mesh = new THREE.Mesh( geometry, material);
+	    scene.add( mesh );
+	});
+	texLoader.load('back.png', function(texture) { // onload
+	    map_back = texture;
+	    material_back = new THREE.MeshBasicMaterial( { map: map_back } );
+	    mesh_back = new THREE.Mesh( geometry_back, material_back);
+	    scene.add( mesh_back );
+	});
+    } else {
+	material = new THREE.MeshBasicMaterial( { map: map } )
+	mesh = new THREE.Mesh( geometry, material);
+	scene.add( mesh );
+	material_back = new THREE.MeshBasicMaterial( { map: map_back } );
+	mesh_back = new THREE.Mesh( geometry_back, material_back);
+	scene.add( mesh_back );
+    }
+}
+
+function animate() {
+	requestAnimationFrame( animate );
+	renderer.render( scene, camera );
+}
+
 /*
- * ファイルがドロップされた時の処理
+ * Select Handler
  */
+foldingTypeSelect.addEventListener("change", function(e) {
+    updateTexture();
+});
+reverseDirectionSelect.addEventListener("change", function(e) {
+    updateTexture();
+});
+
+/*
+ * ImageFile drop handler
+*/
 var cancelEvent = function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -24,20 +149,21 @@ document.addEventListener("drop" , function(e) {
 	    var dataURL = e.target.result;
             var image = new Image();
             image.onload = function() {
-		var canvas = document.createElement("canvas");
-		canvas.width = image.width;
-		canvas.height = image.height;
-		var ctx = canvas.getContext("2d");
-		ctx.drawImage(image, 0, 0, image.width, image.height,
-			      0, 0, canvas.width, canvas.height);
-		var texture = new THREE.Texture(canvas);
-		texture.needsUpdate = true;
+		var texture = new THREE.Texture(image);
+		 texture.needsUpdate = true;
 		// console.log(camera.position);
 		if (camera.position.z > 0) {
-		    material.map = texture;
+		    if (map) {
+			map.dispose();
+		    }
+		    map = texture;
 		} else {
-		    material_back.map = texture;
+		    if (map_back) {
+			map_back.dispose();
+		    }
+		    map_back = texture;
 		}
+		updateTexture();
             }
             image.src = dataURL;
         }
@@ -45,53 +171,3 @@ document.addEventListener("drop" , function(e) {
     }
     return false;
 }, false);
-
-
-    
-function init() {
-    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-    camera.position.z = 1.5;
-    scene = new THREE.Scene();
-    
-    var geometry = new THREE.PlaneGeometry( 2, 1, 3, 1);
-    console.log(geometry.vertices);
-    geometry.vertices[0].x = geometry.vertices[4].x = -0.5;
-    geometry.vertices[0].z = geometry.vertices[4].z = 0.5;
-    geometry.vertices[3].x = geometry.vertices[7].x = 0.5;
-    geometry.vertices[3].z = geometry.vertices[7].z = 0.5;
-
-    /*
-    var texLoader = new THREE.TextureLoader();
-    texLoader.load('front.jpg', texture => { // onload
-	material = new THREE.MeshBasicMaterial( { map: texture } )
-	scene.add( new THREE.Mesh( geometry, material) );
-    });
-    texLoader.load('back.jpg', texture => { // onload
-	var material = new THREE.MeshBasicMaterial( { map: texture,
-						      side: THREE.BackSide} );
-	scene.add( new THREE.Mesh( geometry, material) );
-    });
-    */
-    var map = THREE.ImageUtils.loadTexture( 'front.jpg' );
-    material = new THREE.MeshBasicMaterial( { map: map } )
-    scene.add( new THREE.Mesh( geometry, material) );
-
-    map = THREE.ImageUtils.loadTexture( 'back.jpg' );
-     material_back = new THREE.MeshBasicMaterial( { map: map,
-					    side:  THREE.BackSide} );
-    scene.add( new THREE.Mesh( geometry, material_back) );
-
-    scene.add( new THREE.AxesHelper(100) );
-    //
-    renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-    renderer.setClearColor( 0x000000, 0 );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
-    new THREE.OrbitControls( camera, renderer.domElement );
-}
-
-function animate() {
-	requestAnimationFrame( animate );
-	renderer.render( scene, camera );
-}
-
