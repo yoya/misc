@@ -8,19 +8,14 @@ var mesh = null, mesh_back;
 var foldingTypeSelect = document.getElementById("foldingTypeSelect");
 var reverseDirectionSelect = document.getElementById("reverseDirectionSelect");
 
+var canvas = document.getElementById("canvas3d");
+
 init();
 updateTexture();
 animate();
 
-<<<<<<< HEAD
 function init() {
-    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-    camera.position.z = 1.5;
-    scene = new THREE.Scene();
-    scene.add( new THREE.AxesHelper(100) );
-    
-    var canvas = document.getElementById("canvas3d");
-    var [windowWidth, windowHeight] = [window.innerWidth, window.innerHeight]
+    var [windowWidth, windowHeight] = [window.innerWidth, window.innerHeight];
     var aspect = 1.3;
     if (windowWidth  >  (windowHeight * aspect))  {
 	canvas.width = windowHeight *  aspect;
@@ -29,11 +24,33 @@ function init() {
 	canvas.width = windowWidth;
 	canvas.height = windowWidth / aspect;
     }
+    camera = new THREE.PerspectiveCamera( 70, aspect, 0.01, 10 );
+    camera.position.z = 1.5;
+    scene = new THREE.Scene();
+    scene.add( new THREE.AxesHelper(100) );
+    
     renderer = new THREE.WebGLRenderer( { canvas:canvas, antialias: false } );
     // renderer.setClearColor( 0x000000, 0 );
     // document.body.appendChild( renderer.domElement );
     new THREE.OrbitControls( camera, renderer.domElement );
 }
+
+function resize() {
+    var [windowWidth, windowHeight] = [window.innerWidth, window.innerHeight];
+    var aspect = 1.3;
+    if (windowWidth  >  (windowHeight * aspect))  {
+	canvas.width = windowHeight *  aspect;
+	canvas.height = windowHeight;
+    } else {
+	canvas.width = windowWidth;
+	canvas.height = windowWidth / aspect;
+    }
+    // http://gupuru.hatenablog.jp/entry/2014/01/04/223708
+    renderer.setSize(canvas.width, canvas.height);
+    camera.aspect = aspect;
+    camera.updateProjectionMatrix();
+}
+
 
 function updateTexture() {
     var foldingType = foldingTypeSelect.value;
@@ -132,10 +149,16 @@ reverseDirectionSelect.addEventListener("change", function(e) {
 });
 
 /*
+ * resize
+ */
+
+window.addEventListener("resize" , function(e) {
+    resize();
+});
+
+/*
  * ImageFile drop handler
 */
-=======
->>>>>>> 80411ac9d2798ef92be2ed48c85af767b771750b
 var cancelEvent = function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -153,11 +176,7 @@ document.addEventListener("drop" , function(e) {
             var image = new Image();
             image.onload = function() {
 		var texture = new THREE.Texture(image);
-<<<<<<< HEAD
 		 texture.needsUpdate = true;
-=======
-		texture.needsUpdate = true;
->>>>>>> 80411ac9d2798ef92be2ed48c85af767b771750b
 		// console.log(camera.position);
 		if (camera.position.z > 0) {
 		    if (map) {
@@ -178,51 +197,3 @@ document.addEventListener("drop" , function(e) {
     }
     return false;
 }, false);
-<<<<<<< HEAD
-=======
-
-
-    
-function init() {
-    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-    camera.position.z = 1.5;
-    scene = new THREE.Scene();
-    scene.add( new THREE.AxesHelper(100) );
-    
-    var geometry = new THREE.PlaneGeometry( 2, 1, 3, 1);
-    var geometry_back = new THREE.PlaneGeometry( 2, 1, 3, 1);
-    console.log(geometry.vertices);
-    // folding geometry
-    geometry.vertices[0].x = geometry.vertices[4].x = -0.5;
-    geometry.vertices[0].z = geometry.vertices[4].z = 0.5;
-    geometry.vertices[3].x = geometry.vertices[7].x = 0.5;
-    geometry.vertices[3].z = geometry.vertices[7].z = 0.5;
-    // reverse geometry
-    for (var i = 0, l = geometry.vertices.length ; i < l/2; i++) {
-	geometry_back.vertices[      i] = geometry.vertices[l/2 - i - 1];
-	geometry_back.vertices[l/2 + i] = geometry.vertices[l   - i - 1];
-    }
-
-    var texLoader = new THREE.TextureLoader();
-    
-    texLoader.load('front.jpg', function(texture) { // onload
-	material = new THREE.MeshBasicMaterial( { map: texture } )
-	scene.add( new THREE.Mesh( geometry, material) );
-    });
-    texLoader.load('back.jpg', function(texture) { // onload
-	material_back = new THREE.MeshBasicMaterial( { map: texture } );
-	scene.add( new THREE.Mesh( geometry_back, material_back) );
-    });
-
-    renderer = new THREE.WebGLRenderer( { antialias: false, alpha: true } );
-    renderer.setClearColor( 0x000000, 0 );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
-    new THREE.OrbitControls( camera, renderer.domElement );
-}
-
-function animate() {
-	requestAnimationFrame( animate );
-	renderer.render( scene, camera );
-}
->>>>>>> 80411ac9d2798ef92be2ed48c85af767b771750b
