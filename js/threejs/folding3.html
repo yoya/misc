@@ -4,19 +4,31 @@
     <title> Folding @ Three.JS </title>
   </head>
   </head>
-FoldingType:
   <body bgcolor="silver">
-    <select id="foldingTypeSelect" size="4">
-      <option value="fold2"              > fold2       </option>
-      <option value="fold3curl" selected > fold3 curly </option>
-      <option value="fold3z"             > fold3 (z)   </option>
-    </select>
-ReverseDirection:
-    <select id="reverseDirectionSelect" size="4">
-      <option value="horizontal" selected> horizontal </option>
-      <option value="vertical"           > vertical   </option>
-    </select>
-    <canvas id="canvas3d"> canvas unsupported ? </canvas>
+    <div id="controller">
+      <div style="float:left ; padding: 8px ;">
+      FoldingType:<br />
+      <select id="foldingTypeSelect" size="4">
+	<option value="fold2"              > fold2       </option>
+	<option value="fold3curl" selected > fold3 curly </option>
+	<option value="fold3z"             > fold3 (z)   </option>
+      </select>
+      </div>
+      <div style="float:left ; padding: 8px ;">
+	ReverseDirection:<br />
+	<select id="reverseDirectionSelect" size="4">
+	  <option value="horizontal" selected> horizontal </option>
+	  <option value="vertical"           > vertical   </option>
+	</select>
+      </div>
+      <div style="padding: 8px ;">
+	Degree:<br />
+	<input id="degreeRange" type="range" min="0" max="0.9" step="0.01" value="0.5"> <input type="text" id="degreeText" size="5">
+      </div>
+    </div> <!-- controller -->
+    <div id="display">
+      <canvas id="canvas3d"> canvas unsupported ? </canvas>
+    </div> <!-- display -->
     <script src="three.min.js"></script>
     <script src="OrbitControls.js"></script>
     <script type="text/javascript" src="folding3.js"></script>

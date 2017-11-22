@@ -7,6 +7,11 @@ var mesh = null, mesh_back;
 
 var foldingTypeSelect = document.getElementById("foldingTypeSelect");
 var reverseDirectionSelect = document.getElementById("reverseDirectionSelect");
+var foldingType,  reverseDirection;
+
+var degreeRange = document.getElementById("degreeRange");
+var degreeText = document.getElementById("degreeText");
+var degree = degreeText.value = degreeRange.value;
 
 var canvas = document.getElementById("canvas3d");
 
@@ -15,7 +20,9 @@ updateTexture();
 animate();
 
 function init() {
-    var [windowWidth, windowHeight] = [window.innerWidth, window.innerHeight];
+    //var [windowWidth, windowHeight] = [window.innerWidth, window.innerHeight];
+    var windowWidth = window.innerWidth;
+    var windowHeight = window.innerHeight;
     var aspect = 1.3;
     if (windowWidth  >  (windowHeight * aspect))  {
 	canvas.width = windowHeight *  aspect;
@@ -25,18 +32,20 @@ function init() {
 	canvas.height = windowWidth / aspect;
     }
     camera = new THREE.PerspectiveCamera( 70, aspect, 0.01, 10 );
+    camera.position.x = 0.5;
+    camera.position.y = 1.5;
     camera.position.z = 1.5;
     scene = new THREE.Scene();
     scene.add( new THREE.AxesHelper(100) );
     
-    renderer = new THREE.WebGLRenderer( { canvas:canvas, antialias: false } );
-    // renderer.setClearColor( 0x000000, 0 );
-    // document.body.appendChild( renderer.domElement );
+    renderer = new THREE.WebGLRenderer( { canvas:canvas, antialias: false, alpha:true } );
+    renderer.setClearColor( 0x000000, 0 );
     new THREE.OrbitControls( camera, renderer.domElement );
 }
 
 function resize() {
-    var [windowWidth, windowHeight] = [window.innerWidth, window.innerHeight];
+    var windowWidth = window.innerWidth;
+    var windowHeight = window.innerHeight;
     var aspect = 1.3;
     if (windowWidth  >  (windowHeight * aspect))  {
 	canvas.width = windowHeight *  aspect;
@@ -51,10 +60,9 @@ function resize() {
     camera.updateProjectionMatrix();
 }
 
-
 function updateTexture() {
-    var foldingType = foldingTypeSelect.value;
-    var reverseDirection = reverseDirectionSelect.value;
+    foldingType = foldingTypeSelect.value;
+    reverseDirection = reverseDirectionSelect.value;
     console.log("updateTexture("+foldingType+","+reverseDirection+")");
     if (mesh) {
 	scene.remove( mesh );
@@ -69,16 +77,17 @@ function updateTexture() {
     if (foldingType === undefined) {
 	foldingType = "fold3curl";
     }
-    var [planeRows, planeCols] = [1, 1]
+    var planeRows = 1;
+    var planeCols = 1;
     if (foldingType === "fold2") {
-	[planeRows, planeCols] = [2, 1];
+	planeRows = 2;
     } else {
-	[planeRows, planeCols] = [3, 1];
+	planeRows = 3;
     }
     geometry = new THREE.PlaneGeometry( 2, 1.5, planeRows, planeCols );
     geometry_back = new THREE.PlaneGeometry( 2, 1.5, planeRows, planeCols );
     console.log(geometry.vertices);
-    foldingGeometry(foldingType, reverseDirection, 0.5);
+    foldingGeometry(foldingType, reverseDirection, degree);
 
     if (map === null) {
 	var texLoader = new THREE.TextureLoader();
@@ -108,19 +117,21 @@ function updateTexture() {
 // degree 0 => 1
 function foldingGeometry(foldingType, reverseDirection, degree) {
     // folding geometry
+    var v_0, v_2, v_3, v_4, v_5, v_7;
+    var e_r, e_l;
     if (foldingType === "fold2") {
 	/*
 	  0:(-1, 0.5) 1:(0, 0.5) 2:(1, 0.5)
 	  3:(-1,-0.5) 4:(0,-0.5) 5:(1,-0.5)
 	  const 1, 4
 	*/
-	var v_0 = new THREE.Vector3(-1, 0, 0 );
-	var v_2 = new THREE.Vector3( 1, 0, 0 );
-	var v_3 = new THREE.Vector3(-1, 0, 0 );
-	var v_5 = new THREE.Vector3( 1, 0, 0 );
-	console.log([v_0, v_2, v_3, v_5]);
-	var e_r = new THREE.Euler( 0, -Math.PI / 2 * degree, 0 );
-	var e_l = new THREE.Euler( 0, Math.PI / 2 * degree, 0 );
+	v_0 = new THREE.Vector3(-1, 0, 0 );
+	v_2 = new THREE.Vector3( 1, 0, 0 );
+	v_3 = new THREE.Vector3(-1, 0, 0 );
+	v_5 = new THREE.Vector3( 1, 0, 0 );
+	console.log("new vector:", [v_0, v_2, v_3, v_5]);
+	e_r = new THREE.Euler( 0, -Math.PI / 2 * degree, 0);
+	e_l = new THREE.Euler( 0, Math.PI / 2 * degree, 0);
 	console.log("e_r, e_l:", e_r, e_l);
 	v_0.applyEuler(e_l);  v_2.applyEuler(e_r);
 	v_3.applyEuler(e_l);  v_5.applyEuler(e_r);
@@ -139,20 +150,21 @@ function foldingGeometry(foldingType, reverseDirection, degree) {
 	  4:(-1,-0.5) 5:(-0.333,-0.5) 6:(0.333,-0.5) 7:(1:-0.5)
 	  const 1, 2, 5, 6
 	*/
-	var v_0 = new THREE.Vector3(-(1/3), 0, 0 );
-	var v_3 = new THREE.Vector3( (1/3), 0, 0 );
-	var v_4 = new THREE.Vector3(-(1/3), 0, 0 );
-	var v_7 = new THREE.Vector3( (1/3), 0, 0 );
-	var e_r = new THREE.Euler( 0, -Math.PI / 2 * degree, 0 );
-	var e_l = new THREE.Euler( 0, Math.PI  * degree, 0 );
+	v_0 = new THREE.Vector3(-(2/3), 0, 0 );
+	v_3 = new THREE.Vector3( (2/3), 0, 0 );
+	v_4 = new THREE.Vector3(-(2/3), 0, 0 );
+	v_7 = new THREE.Vector3( (2/3), 0, 0 );
+	console.log("new vector:", [v_0, v_3, v_4, v_7]);;
+	e_r = new THREE.Euler( 0, -Math.PI / 2 * degree, 0);
+	e_l = new THREE.Euler( 0, Math.PI  * degree, 0);
 	console.log("e_r, e_l:", e_r, e_l);
 	v_0.applyEuler(e_l);  v_3.applyEuler(e_r);
 	v_4.applyEuler(e_l);  v_7.applyEuler(e_r);
 	console.log("after euler:", [v_0, v_3, v_4, v_7]);
-	v_0.add(geometry.vertices[0]);
-	v_3.add(geometry.vertices[3]);
-	v_4.add(geometry.vertices[4]);
-	v_7.add(geometry.vertices[7]);
+	v_0.add(geometry.vertices[1]);
+	v_3.add(geometry.vertices[2]);
+	v_4.add(geometry.vertices[5]);
+	v_7.add(geometry.vertices[6]);
 	console.log("after add:", [v_0, v_3, v_4, v_7]);
 	geometry.vertices[0] = v_0;  geometry.vertices[3] = v_3;
 	geometry.vertices[4] = v_4;  geometry.vertices[7] = v_7;
@@ -163,20 +175,21 @@ function foldingGeometry(foldingType, reverseDirection, degree) {
 	  4:(-1,-0.5) 5:(-0.333,-0.5) 6:(0.333,-0.5) 7:(1:-0.5)
 	  const 1, 2, 5, 6
 	*/
-	var v_0 = new THREE.Vector3(-(1/3), 0, 0 );
-	var v_3 = new THREE.Vector3( (1/3), 0, 0 );
-	var v_4 = new THREE.Vector3(-(1/3), 0, 0 );
-	var v_7 = new THREE.Vector3( (1/3), 0, 0 );
-	var e_r = new THREE.Euler( 0, Math.PI * degree, 0 );
-	var e_l = new THREE.Euler( 0, Math.PI * degree, 0 );
+	v_0 = new THREE.Vector3(-(2/3), 0, 0 );
+	v_3 = new THREE.Vector3( (2/3), 0, 0 );
+	v_4 = new THREE.Vector3(-(2/3), 0, 0 );
+	v_7 = new THREE.Vector3( (2/3), 0, 0 );
+	console.log("new vector:", [v_0, v_3, v_4, v_7]);
+	e_r = new THREE.Euler( 0, Math.PI * degree, 0);
+	e_l = new THREE.Euler( 0, Math.PI * degree, 0);
 	console.log("e_r, e_l:", e_r, e_l);
 	v_0.applyEuler(e_l);  v_3.applyEuler(e_r);
 	v_4.applyEuler(e_l);  v_7.applyEuler(e_r);
 	console.log("after euler:", [v_0, v_3, v_4, v_7]);
-	v_0.add(geometry.vertices[0]);
-	v_3.add(geometry.vertices[3]);
-	v_4.add(geometry.vertices[4]);
-	v_7.add(geometry.vertices[7]);
+	v_0.add(geometry.vertices[1]);
+	v_3.add(geometry.vertices[2]);
+	v_4.add(geometry.vertices[5]);
+	v_7.add(geometry.vertices[6]);
 	console.log("after add:", [v_0, v_3, v_4, v_7]);
 	geometry.vertices[0] = v_0;  geometry.vertices[3] = v_3;
 	geometry.vertices[4] = v_4;  geometry.vertices[7] = v_7;
@@ -208,6 +221,7 @@ function foldingGeometry(foldingType, reverseDirection, degree) {
     geometry_back.normalsNeedUpdate = true;
     geometry_back.colorsNeedUpdate = true;
     geometry_back.tangentsNeedUpdate = true;
+    v_0 = v_2 =v_3 = v_4 = v_5 = v_7 = null;
 }
 
 function animate() {
@@ -274,3 +288,9 @@ document.addEventListener("drop" , function(e) {
     }
     return false;
 }, false);
+
+degreeRange.addEventListener("mousemove", function() {
+    degree = degreeRange.value;
+    degreeText.value = degree;
+    foldingGeometry(foldingType, reverseDirection, degree);
+});
