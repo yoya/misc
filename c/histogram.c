@@ -11,9 +11,9 @@ int main(int argc, char **argv) {
 	histogram[c] += 1;
     }
     for (int i = 0 ; i < 256 ; i++) {
-	if (histogram[i] > 0) {
+	//if (histogram[i] > 0) {
 	    printf("%02X %ld\n", i, histogram[i] );
-	}
+	//}
     }
     return 0;
 }
