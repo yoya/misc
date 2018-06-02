@@ -41,8 +41,6 @@ $gradTable = [
                 $opacities2],
 ];
 
-$scale = 1;
-
 $cellSize = [100, 100];
 
 $gridTable = [
@@ -50,7 +48,7 @@ $gridTable = [
         ["grad" => "rgrad", "scale" => [0.5, 1], "ratio" => [0.3, 0.4],
          "round" =>[0.1, 0.1] ],
         ["grad" => "bgrad", "scale" => [0.5, 1], "ratio" => [0.3, 0.6],
-        "round" =>[0.1, 0.1] ],
+         "round" =>[0.1, 0.1] ],
     ],
     [
         ["grad" => "ggrad", "scale" => [0.2, 1], "ratio" => [0.2, 0.9],
@@ -59,6 +57,7 @@ $gridTable = [
          "round" =>[0.1, 0.1] ],
     ],
 ];
+$gridOption = ["index" => ["x", "x2y"]];
 
 foreach ($gradTable as $id => $gradEntry) {
     list($posi, $colors, $opacities) = $gradEntry;
@@ -86,7 +85,18 @@ for ($y = 0, $yi = 0; $y < ($height + $cellSize[1]) ; $yi++) {
         $xi_mod = $xi % count($gridTable);
         $gridTableEntry = $gridTable[$xi_mod];
         $yi_mod = $yi % count($gridTableEntry);
-        $cell = $gridTable[$xi_mod][$yi_mod];
+        $cell = $gridTableEntry[$yi_mod];
+        if (isset($gridOption["index"])) {
+            $index = $gridOption["index"];
+            if ($index[0] === "x2y") {
+                $xi_mod = ($xi/2 + $yi) % count($gridTable);
+            }
+            $gridTableEntry = $gridTable[$xi_mod];
+            if ($index[1] === "x2y") {
+                $yi_mod = ($xi/2 + $yi) % count($gridTableEntry);
+            }
+            $cell = $gridTableEntry[$yi_mod];
+        }
         //
         $color = "url(#".$cell["grad"].")";
         $x1 = $x;
