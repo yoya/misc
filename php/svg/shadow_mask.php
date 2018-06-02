@@ -32,10 +32,10 @@ $gradTable = [
 ];
 
 foreach ($gradTable as $id => $colors) {
-    $grad = new SVGRadialGradient(0.5, 0.5, 0.55);
+    $grad = new SVGRadialGradient(0.5, 0.5, 0.45);
     $grad->setAttribute("id", $id);
-    $stop0 = new SVGStop("50%", $colors[0]);
-    $stop1 = new SVGStop("80%", $colors[1]);
+    $stop0 = new SVGStop("60%", $colors[0]);
+    $stop1 = new SVGStop("90%", $colors[1]);
     $stop2 = new SVGStop("100%",$colors[2]);
     $grad->addChild($stop0);
     $grad->addChild($stop1);
