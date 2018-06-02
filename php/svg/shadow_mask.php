@@ -2,7 +2,7 @@
 
 /*
  *  (c) 2017/08/20- yoya@awm.jp
- * $ composer require meyfa/php-svg
+ * $ composer require yoya/php-svg
  */ 
 require_once("vendor/autoload.php");
              
