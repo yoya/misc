@@ -1,16 +1,24 @@
 <?php
 
 function usage() {
-    echo "Usage: php webarchive.php <target_url> # http:// https:// only ".PHP_EOL;
-    echo "ex) php webarchive.php http://app.awm.jp".PHP_EOL;
+    echo "Usage: php webarchive.php <get|check> <target_url> # http:// https:// only ".PHP_EOL;
+    echo "ex) php webarchive.php get http://app.awm.jp".PHP_EOL;
 }
 
-if ($argc != 2)  {
+if ($argc != 3)  {
+    echo "too few arguments".PHP_EOL;
     usage();
     exit (1);
 }
 
-$targetURL = $argv[1];
+$method = $argv[1];
+if (($method !== "check") && ($method !== "get")) {
+    echo "method:$method support, check or get".PHP_EOL;
+    usage();
+    exit (1);
+}
+
+$targetURL = $argv[2];
 
 $permit_protocols = ["http://", "https://"];
 $permit_protocol = null;
@@ -22,6 +30,7 @@ foreach ($permit_protocols as $proto) {
 }
 
 if (is_null($permit_protocol)) {
+    echo "protocol support, http:// or https://".PHP_EOL;
     usage();
     exit (1);    
 }
@@ -33,13 +42,21 @@ $pagedir = urlencode($pagedir);
 $calenderFile = "$pagedir/sparkline.json";
 
 if (! is_dir($pagedir)) {
+    if ($method !== "get") {
+        echo "Error: pagedir:$pagedir not found.".PHP_EOL;
+        exit (1);
+    }
     if (! mkdir($pagedir, 0755)) {
-        echo "Can't directory $pagedir".PHP_EOL;
+        echo "Can't make directory $pagedir".PHP_EOL;
         exit (1);
     }
 }
 
 if (! is_file($calenderFile)) {
+    if ($method !== "get") {
+        echo "Error: calenderFile:$calenderFile  not found.".PHP_EOL;
+        exit (1);
+    }
     echo $calenderURL.PHP_EOL;
     $calenderJSON = file_get_contents($calenderURL);
     file_put_contents($calenderFile, $calenderJSON);
@@ -58,7 +75,11 @@ foreach ($years as $year => $months) {
     foreach ($months as $month => $count) {
         if ($count <= 0) { continue; }  // skip
         $month++; // one origin
-        $ret = fetch_month_archive($year, $month, $count);
+        if ($method === "check") {
+            $ret = check_month_archive($year, $month, $count);
+        } else { // "get"
+            $ret = fetch_month_archive($year, $month, $count);
+        }
         if (! $ret) {
             var_dump($ret);
             echo "failed: fetch_month_archive".PHP_EOL;
@@ -67,8 +88,31 @@ foreach ($years as $year => $months) {
     }
 }
 
+function check_month_archive($year, $month, $count) {
+    global $pagedir;
+    echo "Year:{$year} Month:{$month}: count:{$count}";
+    $ymd = sprintf("%02d%02d", $year, $month);
+    $actual_count = 0;
+    foreach (glob("$pagedir/$ymd"."????????")as $file) {
+        if ($n = preg_match('/\d{4}\d{2}(\d{2})(\d{6})/', $file, $matches) === 0) {
+            echo "unexpected file:$file got.".PHP_EOL;
+            return false;
+        }
+        list ($dummy, $day, $hms)  = $matches;
+        if ($hms !== "000000") {
+            $actual_count++;
+        }
+    }
+    echo "=>$actual_count";
+    if ($count !== $actual_count) {
+        echo " diff(".($actual_count-$count).")";
+    }
+    echo PHP_EOL;
+    return true;
+}
+
 function fetch_month_archive($year, $month, $count) {
-    echo "Month:{$month}: count:{$count}".PHP_EOL;
+    echo "Year:{$year} Month:{$month}: count:{$count}".PHP_EOL;
     return fetch_month_archive_rec($year, $month, 1, 31, $count);
 }
 
