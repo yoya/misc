@@ -188,7 +188,7 @@ int main(int argc, char **argv) {
           std::cerr << "incompleted rgb-datae:" << std::endl;
           std::exit (1);
         }
-        std::cout <<  std::hex << cc;
+        std::cout << std::hex << cc;
       }
       std::cout << " ";
     }
