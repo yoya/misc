@@ -103,15 +103,18 @@ std::map<std::string, std::string> parseJson(std::string jsondata) {
 
 int readNPYheader(std::ifstream &fin, int &bitdepth,
                   int &width, int &height, int &channels) {
-  char sig[6], ver[2];
+  char sig[6];
+  uint16_t ver;
   unsigned short jsonlen;
   fin.read(sig, 6);
   if (std::memcmp(sig, "\x93NUMPY", 6) != 0) {
     std::cerr << "wrong npy signature" << sig << std::endl;
     return 1;
   }
-  fin.read(ver, 2);
-  fin.read((char *) &jsonlen, sizeof(unsigned short));
+  fin.read((char *) &ver, sizeof(uint16_t));
+  // ver = (ver << 8) | (ver >> 8); // big => little endian
+  fin.read((char *) &jsonlen, sizeof(uint16_t));
+  // jsonlen = (jsonlen << 8) | (jsonlen >> 8); // big => little endian
   if (0x80 < (0x0a + jsonlen)) {
     std::cerr << "too long json length" << jsonlen << std::endl;
     return 1;
