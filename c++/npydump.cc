@@ -134,6 +134,7 @@ int readNPYheader(std::ifstream &fin, int &bitdepth,
         std::cerr << "descr must be lu1" << std::endl;
         return 1;
       }
+      bitdepth = 8;
     } else if (key =="fortran_order") {
       if (value != "False") {
         std::cerr << "fortran_order must be False" << std::endl;
