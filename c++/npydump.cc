@@ -154,7 +154,7 @@ int readNPYheader(std::ifstream &fin, int &bitdepth,
       channels = std::stoi(numstrList[2]);
     } else {
       std::cerr << "Unknown json keye:" << key << std::endl;
-        return 1;
+      return 1;
     }
   }
   if (channels != 3) {
