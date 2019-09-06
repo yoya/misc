@@ -187,7 +187,7 @@ int main(int argc, char **argv) {
       for (int c = 0 ; c < channels ; c++) {
         int cc = fin.get();
         if (cc < 0) {
-          std::cerr << "incompleted rgb-datae:" << std::endl;
+          std::cerr << "incompleted rgb-data:" << std::endl;
           std::exit (1);
         }
         std::cout << std::hex << cc;
