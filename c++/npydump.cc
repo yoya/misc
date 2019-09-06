@@ -112,9 +112,11 @@ int readNPYheader(std::ifstream &fin, int &bitdepth,
     return 1;
   }
   fin.read((char *) &ver, sizeof(uint16_t));
-  // ver = (ver << 8) | (ver >> 8); // big => little endian
   fin.read((char *) &jsonlen, sizeof(uint16_t));
-  // jsonlen = (jsonlen << 8) | (jsonlen >> 8); // big => little endian
+  if ((*(uint16_t*)"\1\0") != 1) {  // native order = big endian
+    ver = (ver << 8) | (ver >> 8);
+    jsonlen = (jsonlen << 8) | (jsonlen >> 8);
+  }
   if (0x80 < (0x0a + jsonlen)) {
     std::cerr << "too long json length" << jsonlen << std::endl;
     return 1;
