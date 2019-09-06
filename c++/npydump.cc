@@ -34,6 +34,9 @@ std::string extractInner(std::string strdata, std::string leftSep, std::string r
   }
   return strdata.substr(braseFirstPos + 1, braseLastPos - braseFirstPos - 1);
 }
+std::string extractInner(std::string strdata, std::string sep) {
+  return extractInner(strdata, sep, sep);
+}
 
 // "A,B,(C,D,E)" => "A","B","(C,E,E)"
 std::vector<std::string> jsonCommaSplit(std::string strdata) {
@@ -75,11 +78,11 @@ std::pair<std::string, std::string> jsonKeyValueSplit(std::string strdata) {
   std::string value = strdata.substr(pos + 1, strdata.size() - pos);
   key  = trim(key);
   value = trim(value);
-  auto tmp = extractInner(key, "'", "'");
+  auto tmp = extractInner(key, "'");
   if (tmp.size() > 0) {
     key = tmp;
   }
-  tmp = extractInner(value, "'", "'");
+  tmp = extractInner(value, "'");
   if (tmp.size() > 0) {
     value = tmp;
   }
