@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <sstream>
 
 /*
   read & dump numpy array file.
@@ -104,15 +105,16 @@ std::map<std::string, std::string> parseJson(std::string jsondata) {
   return jsonMap;
 }
 
-int readNPYheader(std::ifstream &fin, int &bitdepth,
+void readNPYheader(std::ifstream &fin, int &bitdepth,
                   int &width, int &height, int &channels) {
   char sig[6];
   uint16_t ver;
   unsigned short jsonlen;
+  std::stringstream ss;
   fin.read(sig, 6);
   if (std::memcmp(sig, "\x93NUMPY", 6) != 0) {
-    std::cerr << "wrong npy signature" << sig << std::endl;
-    return 1;
+    ss << "wrong npy signature:" << sig;
+    throw std::range_error(ss.str());
   }
   fin.read((char *) &ver, sizeof(uint16_t));
   fin.read((char *) &jsonlen, sizeof(uint16_t));
@@ -121,13 +123,13 @@ int readNPYheader(std::ifstream &fin, int &bitdepth,
     jsonlen = (jsonlen << 8) | (jsonlen >> 8);
   }
   if (0x80 < (0x0a + jsonlen)) {
-    std::cerr << "too long json length" << jsonlen << std::endl;
-    return 1;
+    ss << "too long json length:" << jsonlen;
+    throw std::range_error(ss.str());
   }
   std::string jsondata(jsonlen, '\0');
   if (! fin.read((char *)&(jsondata[0]), jsonlen)) {
-    std::cerr << "too short file" << jsonlen << std::endl;
-    return 1;
+    ss << "too short file for jsonlen:" << jsonlen;
+    throw std::range_error(ss.str());
   }
   // std::cerr << jsondata << std::endl;
   // {'descr': '|u1', 'fortran_order': False, 'shape': (46, 70, 3), }
@@ -136,35 +138,34 @@ int readNPYheader(std::ifstream &fin, int &bitdepth,
     std::string key = itr->first, value = itr->second;
     if (key == "descr") {
       if (value != "|u1") {
-        std::cerr << "descr must be lu1" << std::endl;
-        return 1;
+        ss << "descr:" << value << ", must be lu1";
+        throw std::range_error(ss.str());
       }
       bitdepth = 8;
     } else if (key =="fortran_order") {
       if (value != "False") {
-        std::cerr << "fortran_order must be False" << std::endl;
-        std::exit (1);
+        throw std::range_error("fortran_order must be False");
       }
     } else if (key == "shape") {
       value = extractInner(value, "(", ")");
       std::vector<std::string> numstrList = jsonCommaSplit(value);
       if (numstrList.size() != 3) {
-        std::cerr << "Wrong shape size:" << numstrList.size() << std::endl;
-        return 1;
+        ss << "Wrong shape size:" << numstrList.size();
+        throw std::range_error(ss.str());
       }
       height = std::stoi(numstrList[0]);
       width = std::stoi(numstrList[1]);
       channels = std::stoi(numstrList[2]);
     } else {
-      std::cerr << "Unknown json keye:" << key << std::endl;
-      return 1;
+      ss << "Unknown json keye:" << key;
+      throw std::range_error(ss.str());
     }
   }
   if (channels != 3) {
-    std::cerr << "Wrong channels:" << channels << std::endl;
-    return 1;
+    ss << "Wrong channels:" << channels;
+    throw std::range_error(ss.str());
   }
-  return 0;
+  return ;
 }
 
 int main(int argc, char **argv) {
@@ -179,9 +180,10 @@ int main(int argc, char **argv) {
     std::cerr << "Cant' open file:" << infile << std::endl;
     std::exit (1);
   }
-  int ret = readNPYheader(fin, bitdepth, width, height, channels);
-  if (ret != 0) {
-    std::cerr << "Can't read NPY header" << std::endl;
+  try  {
+    readNPYheader(fin, bitdepth, width, height, channels);
+  } catch (std::range_error e) {
+    std::cerr << e.what() << std::endl;
     std::exit (1);
   }
   std::cerr << "width:" << width << " height:" << height << " channels:" << channels << std::endl;
