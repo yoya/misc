@@ -34,7 +34,8 @@ static std::string trim(const std::string str) {
 }
 
 // "{...}" => "..."
-std::string extractInner(std::string strdata, std::string leftSep, std::string rightSep) {
+std::string extractInner(std::string strdata,
+                         std::string leftSep, std::string rightSep) {
   auto braseFirstPos = strdata.find_first_of(leftSep);
   auto braseLastPos = strdata.find_last_of(rightSep);
   if ((braseFirstPos == std::string::npos) ||
@@ -67,7 +68,7 @@ std::vector<std::string> jsonCommaSplit(std::string strdata) {
           std::cerr << "can't closing bracket" << std::endl;
           break;
         }
-      } 
+      }
     }
     if (cur !=  pos) {
       auto value = strdata.substr(cur, pos - cur);
@@ -81,7 +82,7 @@ std::vector<std::string> jsonCommaSplit(std::string strdata) {
 std::pair<std::string, std::string> jsonKeyValueSplit(std::string strdata) {
   auto pos = strdata.find_first_of(":", 0);
   if (pos == std::string::npos) {
-    return std::pair<std::string, std::string>("", ""); // failed
+    return std::pair<std::string, std::string>("", "");  // failed
   }
   std::string key = strdata.substr(0, pos);
   std::string value = strdata.substr(pos + 1, strdata.size() - pos);
@@ -116,7 +117,7 @@ std::map<std::string, std::string> parseJson(std::string jsondata) {
 struct NPYheader_t readNPYheader(std::ifstream &fin) {
   char sig[6];
   uint16_t ver;
-  unsigned short jsonlen;
+  uint16_t jsonlen;
   std::stringstream ss;
   NPYheader_t header;
   fin.read(sig, 6);
@@ -124,9 +125,9 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
     ss << "wrong npy signature:" << sig;
     throw std::runtime_error(ss.str());
   }
-  fin.read((char *) &ver, sizeof(uint16_t));
-  fin.read((char *) &jsonlen, sizeof(uint16_t));
-  if ((*(uint16_t*)"\1\0") != 1) {  // native order = big endian
+  fin.read(reinterpret_cast<char *>(&ver), sizeof(uint16_t));
+  fin.read(reinterpret_cast<char *>(&jsonlen), sizeof(uint16_t));
+  if ((* reinterpret_cast<uint16_t*>("\1\0")) != 1) {  // native order = big endian
     ver = (ver << 8) | (ver >> 8);
     jsonlen = (jsonlen << 8) | (jsonlen >> 8);
   }
@@ -135,7 +136,7 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
     throw std::runtime_error(ss.str());
   }
   std::string jsondata(jsonlen, '\0');
-  if (! fin.read((char *)&(jsondata[0]), jsonlen)) {
+  if (!fin.read(reinterpret_cast<char *>(&(jsondata[0])), jsonlen)) {
     ss << "too short file for jsonlen:" << jsonlen;
     throw std::runtime_error(ss.str());
   }
@@ -179,20 +180,20 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
 int main(int argc, char **argv) {
   if (argc < 2) {
     usage();
-    std::exit (1);
+    std::exit(1);
   }
   char *infile = argv[1];
-  std::ifstream fin( infile, std::ios::in | std::ios::binary );
-  if (!fin){
+  std::ifstream fin(infile, std::ios::in | std::ios::binary);
+  if (!fin) {
     std::cerr << "Cant' open file:" << infile << std::endl;
-    std::exit (1);
+    std::exit(1);
   }
   struct NPYheader_t nh;
   try  {
     nh = readNPYheader(fin);
   } catch (std::runtime_error e) {
     std::cerr << e.what() << std::endl;
-    std::exit (1);
+    std::exit(1);
   }
   std::cerr << "bitdepth:" << nh.bitdepth << "width:" << nh.width << " height:" << nh.height << " channels:" << nh.channels << std::endl;
   for (int y = 0 ; y < nh.height ; y++) {
@@ -201,7 +202,7 @@ int main(int argc, char **argv) {
         int cc = fin.get();
         if (cc < 0) {
           std::cerr << "incompleted rgb-data:" << std::endl;
-          std::exit (1);
+          std::exit(1);
         }
         std::cout << std::hex << cc;
       }
