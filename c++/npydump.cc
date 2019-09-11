@@ -81,7 +81,7 @@ std::vector<std::string> jsonCommaSplit(std::string strdata) {
 std::pair<std::string, std::string> jsonKeyValueSplit(std::string strdata) {
   auto pos = strdata.find_first_of(":", 0);
   if (pos == std::string::npos) {
-    return std::pair<std::string, std::string>("", "");
+    return std::pair<std::string, std::string>("", ""); // failed
   }
   std::string key = strdata.substr(0, pos);
   std::string value = strdata.substr(pos + 1, strdata.size() - pos);
@@ -122,7 +122,7 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
   fin.read(sig, 6);
   if (std::memcmp(sig, "\x93NUMPY", 6) != 0) {
     ss << "wrong npy signature:" << sig;
-    throw std::range_error(ss.str());
+    throw std::runtime_error(ss.str());
   }
   fin.read((char *) &ver, sizeof(uint16_t));
   fin.read((char *) &jsonlen, sizeof(uint16_t));
@@ -132,12 +132,12 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
   }
   if (0x80 < (0x0a + jsonlen)) {
     ss << "too long json length:" << jsonlen;
-    throw std::range_error(ss.str());
+    throw std::runtime_error(ss.str());
   }
   std::string jsondata(jsonlen, '\0');
   if (! fin.read((char *)&(jsondata[0]), jsonlen)) {
     ss << "too short file for jsonlen:" << jsonlen;
-    throw std::range_error(ss.str());
+    throw std::runtime_error(ss.str());
   }
   // std::cerr << jsondata << std::endl;
   // {'descr': '|u1', 'fortran_order': False, 'shape': (46, 70, 3), }
@@ -147,31 +147,31 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
     if (key == "descr") {
       if (value != "|u1") {
         ss << "descr:" << value << ", must be lu1";
-        throw std::range_error(ss.str());
+        throw std::runtime_error(ss.str());
       }
       header.bitdepth = 8;
     } else if (key =="fortran_order") {
       if (value != "False") {
-        throw std::range_error("fortran_order must be False");
+        throw std::runtime_error("fortran_order must be False");
       }
     } else if (key == "shape") {
       value = extractInner(value, "(", ")");
       std::vector<std::string> numstrList = jsonCommaSplit(value);
       if (numstrList.size() != 3) {
         ss << "Wrong shape size:" << numstrList.size();
-        throw std::range_error(ss.str());
+        throw std::runtime_error(ss.str());
       }
       header.height = std::stoi(numstrList[0]);
       header.width = std::stoi(numstrList[1]);
       header.channels = std::stoi(numstrList[2]);
     } else {
       ss << "Unknown json keye:" << key;
-      throw std::range_error(ss.str());
+      throw std::runtime_error(ss.str());
     }
   }
   if (header.channels != 3) {
     ss << "Wrong channels:" << header.channels;
-    throw std::range_error(ss.str());
+    throw std::runtime_error(ss.str());
   }
   return header;
 }
@@ -190,7 +190,7 @@ int main(int argc, char **argv) {
   struct NPYheader_t nh;
   try  {
     nh = readNPYheader(fin);
-  } catch (std::range_error e) {
+  } catch (std::runtime_error e) {
     std::cerr << e.what() << std::endl;
     std::exit (1);
   }
