@@ -10,6 +10,14 @@
   % g++ npydump.cc -std=c++11 -Wall -Wextra
  */
 
+struct NPYheader_t {
+  int bitdepth;
+  int width, height;
+  int channels;
+};
+
+extern struct NPYheader_t readNPYheader(std::ifstream &fin);
+
 void usage() {
   std::cerr << "Usage: npydump <npyfile>" << std::endl;
 }
@@ -105,12 +113,12 @@ std::map<std::string, std::string> parseJson(std::string jsondata) {
   return jsonMap;
 }
 
-void readNPYheader(std::ifstream &fin, int &bitdepth,
-                  int &width, int &height, int &channels) {
+struct NPYheader_t readNPYheader(std::ifstream &fin) {
   char sig[6];
   uint16_t ver;
   unsigned short jsonlen;
   std::stringstream ss;
+  NPYheader_t header;
   fin.read(sig, 6);
   if (std::memcmp(sig, "\x93NUMPY", 6) != 0) {
     ss << "wrong npy signature:" << sig;
@@ -141,7 +149,7 @@ void readNPYheader(std::ifstream &fin, int &bitdepth,
         ss << "descr:" << value << ", must be lu1";
         throw std::range_error(ss.str());
       }
-      bitdepth = 8;
+      header.bitdepth = 8;
     } else if (key =="fortran_order") {
       if (value != "False") {
         throw std::range_error("fortran_order must be False");
@@ -153,23 +161,22 @@ void readNPYheader(std::ifstream &fin, int &bitdepth,
         ss << "Wrong shape size:" << numstrList.size();
         throw std::range_error(ss.str());
       }
-      height = std::stoi(numstrList[0]);
-      width = std::stoi(numstrList[1]);
-      channels = std::stoi(numstrList[2]);
+      header.height = std::stoi(numstrList[0]);
+      header.width = std::stoi(numstrList[1]);
+      header.channels = std::stoi(numstrList[2]);
     } else {
       ss << "Unknown json keye:" << key;
       throw std::range_error(ss.str());
     }
   }
-  if (channels != 3) {
-    ss << "Wrong channels:" << channels;
+  if (header.channels != 3) {
+    ss << "Wrong channels:" << header.channels;
     throw std::range_error(ss.str());
   }
-  return ;
+  return header;
 }
 
 int main(int argc, char **argv) {
-  int bitdepth = 0, width = 0, height = 0, channels = 0;
   if (argc < 2) {
     usage();
     std::exit (1);
@@ -180,16 +187,17 @@ int main(int argc, char **argv) {
     std::cerr << "Cant' open file:" << infile << std::endl;
     std::exit (1);
   }
+  struct NPYheader_t nh;
   try  {
-    readNPYheader(fin, bitdepth, width, height, channels);
+    nh = readNPYheader(fin);
   } catch (std::range_error e) {
     std::cerr << e.what() << std::endl;
     std::exit (1);
   }
-  std::cerr << "width:" << width << " height:" << height << " channels:" << channels << std::endl;
-  for (int y = 0 ; y < height ; y++) {
-    for (int x = 0 ; x < width ; x++) {
-      for (int c = 0 ; c < channels ; c++) {
+  std::cerr << "bitdepth:" << nh.bitdepth << "width:" << nh.width << " height:" << nh.height << " channels:" << nh.channels << std::endl;
+  for (int y = 0 ; y < nh.height ; y++) {
+    for (int x = 0 ; x < nh.width ; x++) {
+      for (int c = 0 ; c < nh.channels ; c++) {
         int cc = fin.get();
         if (cc < 0) {
           std::cerr << "incompleted rgb-data:" << std::endl;
