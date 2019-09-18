@@ -25,11 +25,11 @@ void usage() {
 // " ABC " => "ABC"
 static std::string trim(const std::string str) {
   const char *trimChara = " \t\r\n";
-  std::string::size_type left = str.find_first_not_of(trimChara);
+  auto left = str.find_first_not_of(trimChara);
   if (left  == std::string::npos) {
     return "";
   }
-  std::string::size_type right = str.find_last_not_of(trimChara);
+  auto right = str.find_last_not_of(trimChara);
   return str.substr(left, right - left + 1);
 }
 
@@ -106,7 +106,7 @@ std::map<std::string, std::string> parseJson(std::string jsondata) {
   // std::cerr << innerBracesData << std::endl;
   std::vector<std::string> jsonList = jsonCommaSplit(innerBracesData);
   for (auto jsonElem : jsonList) {
-      std::pair<std::string, std::string> keyvalue = jsonKeyValueSplit(jsonElem);
+    auto  keyvalue = jsonKeyValueSplit(jsonElem);
       if (keyvalue.first.size() > 0) {
         jsonMap[keyvalue.first] = keyvalue.second;
       }
@@ -127,7 +127,8 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
   }
   fin.read(reinterpret_cast<char *>(&ver), sizeof(uint16_t));
   fin.read(reinterpret_cast<char *>(&jsonlen), sizeof(uint16_t));
-  if ((* reinterpret_cast<uint16_t*>("\1\0")) != 1) {  // native order = big endian
+  if ((* reinterpret_cast<const uint16_t*>("\1\0")) != 1) {
+    // native order = big endian
     ver = (ver << 8) | (ver >> 8);
     jsonlen = (jsonlen << 8) | (jsonlen >> 8);
   }
@@ -195,7 +196,8 @@ int main(int argc, char **argv) {
     std::cerr << e.what() << std::endl;
     std::exit(1);
   }
-  std::cerr << "bitdepth:" << nh.bitdepth << "width:" << nh.width << " height:" << nh.height << " channels:" << nh.channels << std::endl;
+  std::cerr << "bitdepth:" << nh.bitdepth << "width:" << nh.width <<
+    " height:" << nh.height << " channels:" << nh.channels << std::endl;
   for (int y = 0 ; y < nh.height ; y++) {
     for (int x = 0 ; x < nh.width ; x++) {
       for (int c = 0 ; c < nh.channels ; c++) {
