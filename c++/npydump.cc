@@ -1,3 +1,7 @@
+/*
+ * Copyright 2019/08/14- yoya@awm.jp
+ */
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -17,6 +21,8 @@ struct NPYheader_t {
 };
 
 extern struct NPYheader_t readNPYheader(std::ifstream &fin);
+extern void readNPYimagedata(std::ifstream &fin, const struct NPYheader_t &nh,
+                             uint8_t *imagedata);
 
 void usage() {
   std::cerr << "Usage: npydump <npyfile>" << std::endl;
@@ -178,6 +184,21 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
   return header;
 }
 
+void readNPYimagedata(std::ifstream &fin, const struct NPYheader_t &nh,
+                      uint8_t *imagedata) {
+  if (imagedata == NULL) {
+    throw std::runtime_error("imagedata == NULL");
+  }
+  int n = nh.width * nh.height * nh.channels;
+  for (int i = 0 ; i < n ; ++i) {
+    int cc = fin.get();
+    if (cc < 0) {
+      throw std::runtime_error("incompleted rgb-data");
+    }
+    imagedata[i] = cc;
+  }
+}
+
 int main(int argc, char **argv) {
   if (argc < 2) {
     usage();
@@ -198,15 +219,15 @@ int main(int argc, char **argv) {
   }
   std::cerr << "bitdepth:" << nh.bitdepth << "width:" << nh.width <<
     " height:" << nh.height << " channels:" << nh.channels << std::endl;
+
+  std::vector<uint8_t> imagedata(nh.width * nh.height * nh.channels);
+  readNPYimagedata(fin, nh, imagedata.data());
+
+  int i = 0;
   for (int y = 0 ; y < nh.height ; y++) {
     for (int x = 0 ; x < nh.width ; x++) {
       for (int c = 0 ; c < nh.channels ; c++) {
-        int cc = fin.get();
-        if (cc < 0) {
-          std::cerr << "incompleted rgb-data:" << std::endl;
-          std::exit(1);
-        }
-        std::cout << std::hex << cc;
+        std::cout << std::hex << static_cast<int>(imagedata[i++]);
       }
       std::cout << " ";
     }
