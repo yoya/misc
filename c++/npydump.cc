@@ -21,8 +21,9 @@ struct NPYheader_t {
 };
 
 extern struct NPYheader_t readNPYheader(std::ifstream &fin);
+template<typename T>
 extern void readNPYimagedata(std::ifstream &fin, const struct NPYheader_t &nh,
-                             uint8_t *imagedata);
+                             T *imagedata);
 
 void usage() {
   std::cerr << "Usage: npydump <npyfile>" << std::endl;
@@ -183,8 +184,9 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
   return header;
 }
 
+template<typename T>
 void readNPYimagedata(std::ifstream &fin, const struct NPYheader_t &nh,
-                      uint8_t *imagedata) {
+                      T *imagedata) {
   if (imagedata == NULL) {
     throw std::runtime_error("imagedata == NULL");
   }
