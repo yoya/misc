@@ -71,8 +71,7 @@ std::vector<std::string> jsonCommaSplit(std::string strdata) {
           auto bCur3 = strdata.find_first_of(",", bCur2 + 1);
           pos = bCur3;
         } else {
-          std::cerr << "can't closing bracket" << std::endl;
-          break;
+          throw std::runtime_error("can't closing bracket");
         }
       }
     }
