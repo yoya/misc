@@ -15,7 +15,7 @@
  */
 
 struct NPYheader_t {
-  int bitdepth;
+  int depth;
   int width, height;
   int channels;
 };
@@ -156,7 +156,7 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
         ss << "descr:" << value << ", must be lu1";
         throw std::runtime_error(ss.str());
       }
-      header.bitdepth = 8;
+      header.depth = 8;
     } else if (key =="fortran_order") {
       if (value != "False") {
         throw std::runtime_error("fortran_order must be False");
@@ -216,7 +216,7 @@ int main(int argc, char **argv) {
     std::cerr << e.what() << std::endl;
     std::exit(1);
   }
-  std::cerr << "bitdepth:" << nh.bitdepth << "width:" << nh.width <<
+  std::cerr << "depth:" << nh.depth << "width:" << nh.width <<
     " height:" << nh.height << " channels:" << nh.channels << std::endl;
 
   std::vector<uint8_t> imagedata(nh.width * nh.height * nh.channels);
