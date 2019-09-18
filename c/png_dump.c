@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     png_infop png_info_ptr = png_create_info_struct(png_ptr);
     if (! png_info_ptr) {
         fprintf(stderr, "can't create info_struct\n");
-        png_destroy_read_struct (&png_ptr, NULL, NULL);
+        png_destroy_read_struct(&png_ptr, NULL, NULL);
         return EXIT_FAILURE;
     }
     png_read_info(png_ptr, png_info_ptr);
