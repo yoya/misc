@@ -2,13 +2,13 @@
  * Copyright 2019/08/14- yoya@awm.jp
  */
 
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <map>
 #include <vector>
 #include <sstream>
-#include "npyread.hpp"
+#include <utility>
+#include "npy.hpp"
 
 // " ABC " => "ABC"
 static std::string trim(const std::string str) {

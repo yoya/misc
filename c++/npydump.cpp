@@ -5,10 +5,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <map>
 #include <vector>
-#include <sstream>
-#include "npyread.hpp"
+#include "npy.hpp"
 
 /*
   read & dump numpy array file.
