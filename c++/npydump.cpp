@@ -11,7 +11,7 @@
 
 /*
   read & dump numpy array file.
-  % g++ npydump.cc -std=c++11 -Wall -Wextra
+  % g++ npydump.cpp -std=c++11 -Wall -Wextra
  */
 
 struct NPYheader_t {
