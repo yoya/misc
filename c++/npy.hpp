@@ -2,6 +2,8 @@
  * Copyright 2019/08/14- yoya@awm.jp
  */
 
+#define NPY_FILE_SIG "\x93NUMPY"
+
 struct NPYheader_t {
   int depth;
   int width, height;

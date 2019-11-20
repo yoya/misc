@@ -108,7 +108,7 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
   std::stringstream ss;
   NPYheader_t header;
   fin.read(sig, 6);
-  if (std::memcmp(sig, "\x93NUMPY", 6) != 0) {
+  if (std::memcmp(sig, NPY_FILE_SIG, sizeof(NPY_FILE_SIG) - 1) != 0) {
     ss << "wrong npy signature:" << sig;
     throw std::runtime_error(ss.str());
   }
