@@ -8,6 +8,7 @@
 #include <vector>
 #include <sstream>
 #include <utility>
+#include <numeric>
 #include "npy.hpp"
 
 // " ABC " => "ABC"
@@ -138,7 +139,7 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
         ss << "descr:" << value << ", must be lu1";
         throw std::runtime_error(ss.str());
       }
-      header.depth = 8;
+      header.valuetype = value;
     } else if (key =="fortran_order") {
       if (value != "False") {
         throw std::runtime_error("fortran_order must be False");
@@ -146,32 +147,29 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
     } else if (key == "shape") {
       value = extractInner(value, "(", ")");
       std::vector<std::string> numstrList = jsonCommaSplit(value);
-      if (numstrList.size() != 3) {
-        ss << "Wrong shape size:" << numstrList.size();
-        throw std::runtime_error(ss.str());
+      if (numstrList.size() <= 0) {
+        throw std::runtime_error("Wrong shape size: 0");
       }
-      header.height = std::stoi(numstrList[0]);
-      header.width = std::stoi(numstrList[1]);
-      header.channels = std::stoi(numstrList[2]);
+      std::vector<int> shape(numstrList.size());
+      for (size_t i = 0 ; i < numstrList.size() ; i++) {
+        shape[i] = std::stoi(numstrList[i]);
+      }
+      header.shape = shape;
     } else {
       ss << "Unknown json keye:" << key;
       throw std::runtime_error(ss.str());
     }
   }
-  if (header.channels != 3) {
-    ss << "Wrong channels:" << header.channels;
-    throw std::runtime_error(ss.str());
-  }
   return header;
 }
 
 template<typename T>
-void readNPYimagedata(std::ifstream &fin, const struct NPYheader_t &nh,
-                      T *imagedata) {
+void readNPYdata(std::ifstream &fin, const struct NPYheader_t &nh,
+                 T *imagedata) {
   if (imagedata == NULL) {
     throw std::runtime_error("imagedata == NULL");
   }
-  int n = nh.width * nh.height * nh.channels;
+  int n = std::accumulate(nh.shape.begin(), nh.shape.end(), 1, std::multiplies<int>());
   for (int i = 0 ; i < n ; ++i) {
     int cc = fin.get();
     if (cc < 0) {
@@ -186,5 +184,11 @@ void npyread_dummy_uchar() {
   std::ifstream fin;
   struct NPYheader_t nh;
   unsigned char *imagedata = NULL;
-  readNPYimagedata(fin, nh, imagedata);
+  readNPYdata(fin, nh, imagedata);
+}
+void npyread_dummy_float() {
+  std::ifstream fin;
+  struct NPYheader_t nh;
+  float *imagedata = NULL;
+  readNPYdata(fin, nh, imagedata);
 }
