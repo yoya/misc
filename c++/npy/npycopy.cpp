@@ -4,11 +4,10 @@
 
 #include <iostream>
 #include <fstream>
-#include <iostream>
 #include <string>
 #include <vector>
-//#include <utility>
 #include <numeric>
+#include <functional>
 #include "npy.hpp"
 
 /*
@@ -46,6 +45,6 @@ int main(int argc, char **argv) {
 
   writeNPYheader(fout, nh);
   writeNPYdata(fout, nh, imagedata.data());
-  
+
   std::cerr << "OK" << std::endl;
 }

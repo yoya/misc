@@ -39,7 +39,7 @@ void writeNPYheader(std::ofstream &fout,
   jsonss.seekg(0, std::ios::end);
   jsonlen = jsonss.tellg();
   fout.write(reinterpret_cast<char *>(&jsonlen), sizeof(uint16_t));
-  fout << jsonss.str() ;
+  fout << jsonss.str();
 }
 
 template<typename T>

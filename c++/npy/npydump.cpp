@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <numeric>
+#include <functional>
 #include "npy.hpp"
 
 /*
@@ -36,13 +37,11 @@ int main(int argc, char **argv) {
     std::cerr << e.what() << std::endl;
     std::exit(1);
   }
-  //std::cerr << "depth:" << nh.depth << "width:" << nh.width <<
-  //" height:" << nh.height << " channels:" << nh.channels << std::endl;
   std::cerr << "shape:";
   int height = nh.shape[0];
   int width = nh.shape[1];
   int channels = nh.shape[2];
-  if (channels != 3) { // channels
+  if (channels != 3) {  // channels
     std::cerr << "wrong channels:" << channels << std::endl;
     std::exit(1);
   }
@@ -52,7 +51,6 @@ int main(int argc, char **argv) {
   //
   int imagedata_size = std::accumulate(nh.shape.begin(), nh.shape.end(), 1, std::multiplies<int>());
   std::vector<uint8_t> imagedata(imagedata_size);
-  //std::vector<float> imagedata(imagedata_size);
   readNPYdata(fin, nh, imagedata.data());
   int i = 0;
   for (int y = 0 ; y < height ; y++) {
