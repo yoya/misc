@@ -10,7 +10,11 @@ struct NPYheader_t {
 };
 
 extern struct NPYheader_t readNPYheader(std::ifstream &fin);
+extern void writeNPYheader(std::ofstream &fin, const struct NPYheader_t &nh);
 
 template<typename T>
 void readNPYdata(std::ifstream &fin, const struct NPYheader_t &nh,
                  T *imagedata);
+template<typename T>
+void writeNPYdata(std::ofstream &fin, const struct NPYheader_t &nh,
+                  T *imagedata);
