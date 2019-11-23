@@ -9,6 +9,7 @@
 #include <sstream>
 #include <utility>
 #include <numeric>
+#include <functional>
 #include "npy.hpp"
 
 // " ABC " => "ABC"
@@ -165,9 +166,9 @@ struct NPYheader_t readNPYheader(std::ifstream &fin) {
 
 template<typename T>
 void readNPYdata(std::ifstream &fin, const struct NPYheader_t &nh,
-                 T *imagedata) {
-  if (imagedata == NULL) {
-    throw std::runtime_error("imagedata == NULL");
+                 T *data) {
+  if (data == NULL) {
+    throw std::runtime_error("data == NULL");
   }
   int n = std::accumulate(nh.shape.begin(), nh.shape.end(), 1, std::multiplies<int>());
   // only little-endian support
@@ -177,7 +178,7 @@ void readNPYdata(std::ifstream &fin, const struct NPYheader_t &nh,
       if (cc < 0) {
         throw std::runtime_error("incompleted rgb-data");
       }
-      imagedata[i] = cc;
+      data[i] = cc;
     }
   } else if (nh.valuetype == "<f4") {
     char fvalue_char[4];
@@ -186,7 +187,7 @@ void readNPYdata(std::ifstream &fin, const struct NPYheader_t &nh,
       if (fin.eof()) {
         throw std::runtime_error("incompleted rgb-data");
       }
-      imagedata[i] = *(reinterpret_cast<float*>(fvalue_char));
+      data[i] = *(reinterpret_cast<float*>(fvalue_char));
     }
   } else {
     throw std::runtime_error("unsupported type:"+nh.valuetype);
@@ -197,12 +198,12 @@ void readNPYdata(std::ifstream &fin, const struct NPYheader_t &nh,
 void npyread_dummy_uchar() {
   std::ifstream fin;
   struct NPYheader_t nh;
-  unsigned char *imagedata = NULL;
-  readNPYdata(fin, nh, imagedata);
+  unsigned char *data = NULL;
+  readNPYdata(fin, nh, data);
 }
 void npyread_dummy_float() {
   std::ifstream fin;
   struct NPYheader_t nh;
-  float *imagedata = NULL;
-  readNPYdata(fin, nh, imagedata);
+  float *data = NULL;
+  readNPYdata(fin, nh, data);
 }
