@@ -11,7 +11,7 @@
 
 /*
   read & dump numpy array file.
-  % g++ npydump.cpp npyread.cpp -std=c++11 -Wall -Wextra
+  % g++ -o npydump npydump.cpp npyread.cpp -std=c++11 -Wall -Wextra
  */
 
 void usage() {
