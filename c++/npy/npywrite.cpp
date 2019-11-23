@@ -44,9 +44,9 @@ void writeNPYheader(std::ofstream &fout,
 
 template<typename T>
 void writeNPYdata(std::ofstream &fout, const struct NPYheader_t &nh,
-                       T *imagedata) {
-  if (imagedata == NULL) {
-    throw std::runtime_error("imagedata == NULL");
+                       T *data) {
+  if (data == NULL) {
+    throw std::runtime_error("data == NULL");
   }
   if ((nh.valuetype != "|u1") && (nh.valuetype != "<f4")) {
     throw std::runtime_error("valuetype(descr):" + nh.valuetype + ", must be |u1 or <f4");
@@ -54,12 +54,12 @@ void writeNPYdata(std::ofstream &fout, const struct NPYheader_t &nh,
   int n = std::accumulate(nh.shape.begin(), nh.shape.end(), 1, std::multiplies<int>());
   if (nh.valuetype == "|u1") {
     for (int i = 0 ; i < n ; ++i) {
-      fout.put(imagedata[i]);
+      fout.put(data[i]);
     }
   } else if (nh.valuetype == "<f4") {
     char fvalue_char[4];
     for (int i = 0 ; i < n ; ++i) {
-      *(reinterpret_cast<float*>(fvalue_char)) = imagedata[i];
+      *(reinterpret_cast<float*>(fvalue_char)) = data[i];
       fout.write(fvalue_char, 4);
     }
   } else {
@@ -71,14 +71,14 @@ void writeNPYdata(std::ofstream &fout, const struct NPYheader_t &nh,
 void npywrite_dummy_uchar() {
   std::ofstream fout;
   struct NPYheader_t nh;
-  unsigned char *imagedata = NULL;
-  writeNPYdata(fout, nh, imagedata);
+  unsigned char *data = NULL;
+  writeNPYdata(fout, nh, data);
 }
 
 // dummy function for template.
 void npywrite_dummy_float() {
   std::ofstream fout;
   struct NPYheader_t nh;
-  float *imagedata = NULL;
-  writeNPYdata(fout, nh, imagedata);
+  float *data = NULL;
+  writeNPYdata(fout, nh, data);
 }
