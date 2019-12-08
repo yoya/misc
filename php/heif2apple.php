@@ -101,8 +101,15 @@ class HEIF_Filter {
                 }
                 break;
             default:
-                $data = fread($in, $len - 8);
-                fwrite($out, $data);
+                if ($len === 1) {
+                    while(!feof($in)) {
+                        $data = fread($in, 0x1000000);
+                        fwrite($out, $data);
+                    }
+                } else {
+                    $data = fread($in, $len - 8);
+                    fwrite($out, $data);
+                }
                 break;
             }
             $boxLen - $len;
