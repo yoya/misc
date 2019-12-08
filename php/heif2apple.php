@@ -22,6 +22,11 @@ if (!$fp_out) { usage("can't create file") ; exit(1); }
 $filter = new HEIF_Filter();
 $filter->heif2apple($fp_in, $fp_out);
 
+fclose($fp_in);
+fclose($fp_out);
+
+exit (0);
+
 class HEIF_Filter {
     function heif2apple($in, $out, $boxLen = null) {
         while (is_null($boxLen) || (0 < $boxLen)) {
