@@ -64,7 +64,7 @@ class HEIF_Filter {
                     }
                     fwrite($out, fread($in, 2));  // dataReferenceIndex
                     $baseOffset = 0;
-                    foreach (range(1, $baseOffsetSize) as $dummy) {
+                    for ($boIdx = 0; $boIdx < $baseOffsetSize; $boIdx++) {
                         $baseOffset = $baseOffset*0x100 + ord(fread($in, 1));
                         fwrite($out, "\0");
                     }
@@ -72,21 +72,23 @@ class HEIF_Filter {
                     $tmp = fread($in, 2);
                     fwrite($out, $tmp);
                     $extentCount = unpack("n", $tmp)[1];
-                    foreach (range(1, $extentCount) as $dummy) {
+                    for ($eIdx = 0; $eIdx < $extentCount; $eIdx++) {
                         $extentOffset = 0;
-                        foreach (range(1, $offsetSize) as $dummy) {
+                        for ($osIdx = 0; $osIdx < $offsetSize; $osIdx++) {
                             $extentOffset = $extentOffset*0x100 + ord(fread($in, 1));
                         }
                         echo "extentOffset:$extentOffset";
                         $extentOffset += $baseOffset;
                         echo " => $extentOffset".PHP_EOL;
-                        foreach (range(1, $offsetSize) as $osi) {
-                            $shift = ($offsetSize - $osi) * 8;
+                        for ($osIdx = 0; $osIdx < $offsetSize; $osIdx++) {
+                            $shift = ($offsetSize - 1 - $osIdx) * 8;
                             $tmp = ($extentOffset >> $shift) & 0xFF;
                             fwrite($out, chr($tmp));
                         }
-                        if ($version > 0) {  // extentIndex
-                            fwrite($out, fread($in, $indexSize));
+                        if ($version > 0) {
+                            if ($indexSize > 0) {  // extentIndex
+                                fwrite($out, fread($in, $indexSize));
+                            }
                         }
                         fwrite($out, fread($in, $lengthSize));  // extentLength
                     }
