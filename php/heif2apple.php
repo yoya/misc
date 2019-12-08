@@ -72,6 +72,9 @@ class HEIF_Filter {
                     $tmp = fread($in, 2);
                     fwrite($out, $tmp);
                     $extentCount = unpack("n", $tmp)[1];
+                    if ($extentCount > 1000) {
+                        throw new Exception("extentCount:$extentCount > 1000");
+                    }
                     for ($eIdx = 0; $eIdx < $extentCount; $eIdx++) {
                         $extentOffset = 0;
                         for ($osIdx = 0; $osIdx < $offsetSize; $osIdx++) {
@@ -80,6 +83,9 @@ class HEIF_Filter {
                         echo "extentOffset:$extentOffset";
                         $extentOffset += $baseOffset;
                         echo " => $extentOffset".PHP_EOL;
+                        if (2**(8*$offsetSize) <= $extentOffset) {
+                            throw new Exception("2**(8*offsetSize:$offsetSize) <= extentOffset:$extentOffset");
+                        }
                         for ($osIdx = 0; $osIdx < $offsetSize; $osIdx++) {
                             $shift = ($offsetSize - 1 - $osIdx) * 8;
                             $tmp = ($extentOffset >> $shift) & 0xFF;
