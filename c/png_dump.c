@@ -56,6 +56,8 @@ int main(int argc, char **argv) {
         png_destroy_read_struct(&png_ptr, NULL, NULL);
         return EXIT_FAILURE;
     }
+    png_set_crc_action(png_ptr, PNG_CRC_WARN_USE, PNG_CRC_WARN_USE);
+
     png_read_info(png_ptr, png_info_ptr);
     png_get_IHDR(png_ptr, png_info_ptr,
                  &png_width, &png_height, &bpp, &color_type,
