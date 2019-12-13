@@ -1,6 +1,6 @@
 /*
-  (c) yoya@awm.jp 2018/07/17-
-  libpng sample
+  (c) yoya@awm.jp 2018/07/17- libpng sample
+  gcc -o png_dump png_dump.c bitstream.c `libpng-config --cflags` `libpng-config --ldflags`
   ref) 
   - http://www.libpng.org/pub/png/libpng-1.2.5-manual.html
   - http://www.amy.hi-ho.ne.jp/jbaba/png2dib.c
