@@ -48,6 +48,12 @@ int main(int argc, char **argv) {
       fprintf(stderr, "can't create read_struct\n");
         return EXIT_FAILURE;
     }
+    if (setjmp(png_jmpbuf(png_ptr))) {
+      fprintf(stderr, "Error: libpng error jump occured\n");
+      png_destroy_read_struct(&png_ptr, NULL, NULL);
+      return 0;
+    }
+
     png_init_io(png_ptr, fp);
 
     png_infop png_info_ptr = png_create_info_struct(png_ptr);
