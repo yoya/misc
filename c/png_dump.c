@@ -1,6 +1,6 @@
 /*
-  (c) yoya@awm.jp 2018/07/17-
-  libpng sample
+  (c) yoya@awm.jp 2018/07/17- libpng sample
+  gcc -o png_dump png_dump.c bitstream.c `libpng-config --cflags` `libpng-config --ldflags`
   ref) 
   - http://www.libpng.org/pub/png/libpng-1.2.5-manual.html
   - http://www.amy.hi-ho.ne.jp/jbaba/png2dib.c
@@ -48,14 +48,22 @@ int main(int argc, char **argv) {
       fprintf(stderr, "can't create read_struct\n");
         return EXIT_FAILURE;
     }
+    if (setjmp(png_jmpbuf(png_ptr))) {
+      fprintf(stderr, "Error: libpng error jump occured\n");
+      png_destroy_read_struct(&png_ptr, NULL, NULL);
+      return 0;
+    }
+
     png_init_io(png_ptr, fp);
 
     png_infop png_info_ptr = png_create_info_struct(png_ptr);
     if (! png_info_ptr) {
         fprintf(stderr, "can't create info_struct\n");
-        png_destroy_read_struct (&png_ptr, NULL, NULL);
+        png_destroy_read_struct(&png_ptr, NULL, NULL);
         return EXIT_FAILURE;
     }
+    png_set_crc_action(png_ptr, PNG_CRC_WARN_USE, PNG_CRC_WARN_USE);
+
     png_read_info(png_ptr, png_info_ptr);
     png_get_IHDR(png_ptr, png_info_ptr,
                  &png_width, &png_height, &bpp, &color_type,
