@@ -19,9 +19,9 @@ class IO_JPEG :
 
     def _parseChunk(self, reader):
         chunk = {}
-        marker1 = reader.getUI8()
-        if marker1 != 0xFF:
-            return {}
+        while reader.hasNextData(2):
+            if reader.getUI8() == 0xFF:
+               break
         marker = reader.getUI8()
         chunk['marker'] = marker
         if marker == 0xD8 or marker == 0xD9: # SOI,EOI
