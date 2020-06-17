@@ -1,5 +1,6 @@
 // 2020/06/18 (c) yoya@awm.jp
 // ref) https://github.com/yoya/IO_ISOBMFF/blob/master/IO/ISOBMFF.php
+// usage) go run heifsetimagesize.go <in.heic> <width> <height> <out.heic>
 
 package main
 
