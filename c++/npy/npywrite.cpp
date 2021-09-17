@@ -48,22 +48,22 @@ void writeNPYdata(std::ofstream &fout, const struct NPYheader_t &nh,
   if (data == NULL) {
     throw std::runtime_error("data == NULL");
   }
-  if ((nh.valuetype != "|u1") && (nh.valuetype != "<f4")) {
-    throw std::runtime_error("valuetype(descr):" + nh.valuetype + ", must be |u1 or <f4");
+  if ((nh.datatype != "|u1") && (nh.datatype != "<f4")) {
+    throw std::runtime_error("datatype(descr):" + nh.datatype + ", must be |u1 or <f4");
   }
   int n = std::accumulate(nh.shape.begin(), nh.shape.end(), 1, std::multiplies<int>());
-  if (nh.valuetype == "|u1") {
+  if (nh.datatype == "|u1") {
     for (int i = 0 ; i < n ; ++i) {
       fout.put(data[i]);
     }
-  } else if (nh.valuetype == "<f4") {
+  } else if (nh.datatype == "<f4") {
     char fvalue_char[4];
     for (int i = 0 ; i < n ; ++i) {
       *(reinterpret_cast<float*>(fvalue_char)) = data[i];
       fout.write(fvalue_char, 4);
     }
   } else {
-    throw std::runtime_error("unsupported type:"+nh.valuetype);
+    throw std::runtime_error("unsupported type:"+nh.datatype);
   }
 }
 
