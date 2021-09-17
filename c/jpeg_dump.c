@@ -148,10 +148,20 @@ void dump_jpeg_dinfo(struct jpeg_decompress_struct *dinfo) {
     printf("    total_iMCU_rows:%d\n",
 	   dinfo->total_iMCU_rows);
 
+    printf("--- components and MCUs actually appearing in the scan.\n");
+    printf("    comps_in_scan:%d cur_comp_info:%p\n",
+	   dinfo->comps_in_scan, dinfo->cur_comp_info);
+    if (dinfo->cur_comp_info) {
+	printf("    cur_comp_info[%d]\n",
+	       dinfo->cur_comp_info.component_index);
+    }
+    printf("    MCUs_per_row:%d MCU_rows_in_scan:%d blocks_in_MCU:%d\n",
+	   dinfo->MCUs_per_row, dinfo->MCU_rows_in_scan,
+	   dinfo->blocks_in_MCU);
     /*
+    printf("--- \n");
     printf("    :%d\n",
 	   );
-
     */
 }
     
