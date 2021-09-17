@@ -4,7 +4,8 @@ import (
 	"flag"
 	"fmt"
 	//"github.com/gographics/imagick/imagick"
-	"gopkg.in/gographics/imagick.v2/imagick"
+	//"gopkg.in/gographics/imagick.v2/imagick"
+	"gopkg.in/gographics/imagick.v3/imagick"
 	"os"
 )
 
