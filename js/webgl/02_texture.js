@@ -110,11 +110,11 @@ function render(image) {
     gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
 
     // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
-    let size = 2;          // 2 components per iteration
-    let type = gl.FLOAT;   // the data is 32bit floats
-    let normalize = false; // don't normalize the data
-    let stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-    let offset = 0;        // start at the beginning of the buffer
+    size = 2;          // 2 components per iteration
+    type = gl.FLOAT;   // the data is 32bit floats
+    normalize = false; // don't normalize the data
+    stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+    offset = 0;        // start at the beginning of the buffer
     gl.vertexAttribPointer(texcoordLocation, size, type, normalize, stride, offset);
 
     // set the resolution
@@ -122,7 +122,7 @@ function render(image) {
 
     // Draw the rectangle.
     let primitiveType = gl.TRIANGLES;
-    let offset = 0;
+    offset = 0;
     let count = 6;
     gl.drawArrays(primitiveType, offset, count);
 }
