@@ -1,0 +1,21 @@
+<html>
+  <head>
+  <title> OpenGL filter </title>
+  <script id="vertex-shader-2d" type="notjs">
+  attribute vec4 a_position;
+    void main() {
+        gl_Position = a_position;
+    }
+  </script>
+  <script id="fragment-shader-2d" type="notjs">
+    precision mediump float;
+    void main() {
+        gl_FragColor = vec4(1, 0, 0.5, 1); // 赤紫
+    }
+  </script>
+  <body>
+    <canvas id="c" width="400" height="300"></canvas>
+    <script type="text/javascript" src="01_triangle.js"> </script>
+    <copyright> (c) https://webglfundamentals.org/webgl/lessons/ja/webgl-fundamentals.html </copyright>
+  </body>
+</html>
