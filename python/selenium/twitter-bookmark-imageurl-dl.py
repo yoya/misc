@@ -30,24 +30,27 @@ def download_picture(img_src, filename):
         with open(filename,'wb') as f:
             shutil.copyfileobj(r.raw, f)
         print('Image sucessfully Downloaded: ',filename)
+        return True
     else:
         print('Image Couldn\'t be retreived')
+        return False
 
 def download_and_delete(driver, article, imgs):
     for img in imgs:
         img_src = img.get_attribute("src")
         [url, filename] = url_to_origurl_filename(img_src)
-        download_picture(url, filename)
-        menus = article.find_elements(By.CSS_SELECTOR, 'div[aria-label="Share Tweet"]')
-        if len(menus) != 1:
-            print("menu count:{} != 1".format(len(menus)))
+        if download_picture(url, filename) == False:
             return
-        #menus[0].click()
-        driver.execute_script('arguments[0].click();', menus[0])
-        time.sleep(1)
-        remove = article.find_element(By.XPATH, '//span[contains(text(),"Remove Tweet from Bookmarks")]')
-        driver.execute_script('arguments[0].click();', remove)
-        time.sleep(1)
+    menus = article.find_elements(By.CSS_SELECTOR, 'div[aria-label="Share Tweet"]')
+    if len(menus) != 1:
+        print("menu count:{} != 1".format(len(menus)))
+        return
+    #menus[0].click()
+    driver.execute_script('arguments[0].click();', menus[0])
+    time.sleep(1)
+    remove = article.find_element(By.XPATH, '//span[contains(text(),"Remove Tweet from Bookmarks")]')
+    driver.execute_script('arguments[0].click();', remove)
+    time.sleep(1)
 
 options = Options()
 #options.add_argument('--headless')
