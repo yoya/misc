@@ -8,15 +8,54 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome import service as fs
+import requests
+import shutil
+from urllib import parse
+
+URL = "https://twitter.com/i/bookmarks"
+COOKIE_FILENAME = "twitter-cookie.json"
+
+def url_to_origurl_filename(src):
+    up = parse.urlparse(src)
+    qs = parse.parse_qs(up.query)
+    fmt = qs['format'][0]
+    url = "{}://{}{}?format={}&name=orig".format(up.scheme, up.netloc, up.path, fmt)
+    filename = "{}.{}".format(up.path.split('/')[-1], fmt);
+    return [url, filename]
+
+def download_picture(img_src, filename):
+    r = requests.get(img_src, stream = True)
+    if r.status_code == 200:
+        r.raw.decode_content = True
+        with open(filename,'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+        print('Image sucessfully Downloaded: ',filename)
+    else:
+        print('Image Couldn\'t be retreived')
+
+def download_and_delete(driver, article, imgs):
+    for img in imgs:
+        img_src = img.get_attribute("src")
+        [url, filename] = url_to_origurl_filename(img_src)
+        download_picture(url, filename)
+        menus = article.find_elements(By.CSS_SELECTOR, 'div[aria-label="Share Tweet"]')
+        if len(menus) != 1:
+            print("menu count:{} != 1".format(len(menus)))
+            return
+        #menus[0].click()
+        driver.execute_script('arguments[0].click();', menus[0])
+        time.sleep(1)
+        remove = article.find_element(By.XPATH, '//span[contains(text(),"Remove Tweet from Bookmarks")]')
+        driver.execute_script('arguments[0].click();', remove)
+        time.sleep(1)
 
 options = Options()
 #options.add_argument('--headless')
 driver = webdriver.Chrome(options=options)
-URL="https://twitter.com/i/bookmarks"
 
 driver.get(URL)
- 
-json_open = open('twitter-cookie.json', 'r')
+
+json_open = open(COOKIE_FILENAME, 'r')
 cookies = json.load(json_open)
  
 for cookie in cookies:
@@ -24,31 +63,18 @@ for cookie in cookies:
     driver.add_cookie(tmp)
  
 driver.get(URL)
-wait = WebDriverWait(driver, 10)
-
-time.sleep(10)
-
-last_img = None
 
 while True:
-#    imgs = driver.find_elements(By.TAG_NAME, "img")
-    while True:
-        imgs = driver.find_elements(By.CSS_SELECTOR, 'img[alt="Image"]')
-        if len(imgs) > 0:
-            break
-        time.sleep(10)
-    if last_img != imgs[-1]:
-        for img in imgs:
-            print(img.get_attribute("src"))
-        last_img = imgs[-1]
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight + 10)")
-    else:
-        tryreload = driver.find_element(By.XPATH, '//span[contains(text(),"Try reloading")]')
-        if tryreload is None:
-            break
-        retry = driver.find_element(By.XPATH, '//span[contains(text(),"Retry")]')
-        retry.click()
-        time.sleep(5)
+    time.sleep(3)
     wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_all_elements_located)
-    time.sleep(5)
+    articles = driver.find_elements(By.CSS_SELECTOR, 'article')
+    print("articles count:{}".format(len(articles)))
+    if len(articles) < 1:
+        break
+    article = articles[0]
+    imgs = article.find_elements(By.CSS_SELECTOR, 'img[alt="Image"]')
+    if len(imgs) > 0:
+        print("imgs count:{} > 0".format(len(imgs)))
+        download_and_delete(driver, article, imgs)
+#    driver.refresh()
