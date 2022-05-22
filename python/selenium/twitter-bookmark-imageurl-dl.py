@@ -67,17 +67,23 @@ for cookie in cookies:
  
 driver.get(URL)
 
+idx = 0
+
 while True:
     time.sleep(3)
     wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_all_elements_located)
     articles = driver.find_elements(By.CSS_SELECTOR, 'article')
     print("articles count:{}".format(len(articles)))
-    if len(articles) < 1:
+    if len(articles) <= idx:
         break
-    article = articles[0]
-    imgs = article.find_elements(By.CSS_SELECTOR, 'img[alt="Image"]')
+    article = articles[idx]
+    imgs = article.find_elements(By.CSS_SELECTOR, 'img[src*="/media/"]')
+    print("imgs count:{}".format(len(imgs)))
     if len(imgs) > 0:
-        print("imgs count:{} > 0".format(len(imgs)))
         download_and_delete(driver, article, imgs)
-#    driver.refresh()
+    else:
+        idx = idx + 1
+
+driver.close();
+print("OK")
