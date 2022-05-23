@@ -6,8 +6,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.chrome import service as fs
+#from selenium.webdriver.common.action_chains import ActionChains
+#from selenium.webdriver.chrome import service as fs
 import requests
 import shutil
 from urllib import parse
@@ -41,15 +41,25 @@ def download_and_delete(driver, article, imgs):
         [url, filename] = url_to_origurl_filename(img_src)
         if download_picture(url, filename) == False:
             return
-    menus = article.find_elements(By.CSS_SELECTOR, 'div[aria-label="Share Tweet"]')
+    try:
+        menus = article.find_elements(By.CSS_SELECTOR, 'div[aria-label="Share Tweet"]')
+    except Exception as e:
+        print(e)
+        driver.refresh()
+        return
     if len(menus) != 1:
         print("menu count:{} != 1".format(len(menus)))
         return
     #menus[0].click()
     driver.execute_script('arguments[0].click();', menus[0])
-    time.sleep(1)
-    remove = article.find_element(By.XPATH, '//span[contains(text(),"Remove Tweet from Bookmarks")]')
-    driver.execute_script('arguments[0].click();', remove)
+    time.sleep(2)
+    try:
+        remove = article.find_element(By.XPATH, '//span[contains(text(),"Remove Tweet from Bookmarks")]')
+        driver.execute_script('arguments[0].click();', remove)
+    except Exception as e:
+        print(e)
+        driver.refresh()
+        return
     time.sleep(1)
 
 options = Options()
@@ -66,24 +76,54 @@ for cookie in cookies:
     driver.add_cookie(tmp)
  
 driver.get(URL)
+driver.execute_script("window.scrollTo(0, document.body.scrollHeight+1)")
+idx = -1
 
-idx = 0
+retry_count = 0
 
 while True:
-    time.sleep(3)
+    time.sleep(10)
     wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_all_elements_located)
+    try:
+        retry = driver.find_element(By.XPATH, '//span[contains(text(),"Retry")]')
+        if retry is not None:
+            retry.click()
+            continue
+    except Exception as e:
+        pass
     articles = driver.find_elements(By.CSS_SELECTOR, 'article')
     print("articles count:{}".format(len(articles)))
-    if len(articles) <= idx:
-        break
+    if len(articles) < 3 - idx:
+        print("scroll aricles < 5")
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight+1)")
+        retry_count = retry_count + 1
+        if retry_count > 5:
+            break
+        print("retry_count:{}".format(retry_count))
+        if retry_count > 2:
+            print("refresh")
+            driver.refresh()
+            time.sleep(5)
+        time.sleep(5)
+        continue;
+    else:
+        retry_count = 0
+    if len(articles) < 7 - idx:
+        print("scroll aricles < 10")
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight+1)")
+        continue;
     article = articles[idx]
     imgs = article.find_elements(By.CSS_SELECTOR, 'img[src*="/media/"]')
     print("imgs count:{}".format(len(imgs)))
     if len(imgs) > 0:
         download_and_delete(driver, article, imgs)
     else:
-        idx = idx + 1
+        idx = idx - 1
+        aa = article.find_elements(By.CSS_SELECTOR, 'a')
+        for a in aa:
+            href = a.get_attribute("href")
+            print("no img href:{}".format(href))
 
 driver.close();
 print("OK")
