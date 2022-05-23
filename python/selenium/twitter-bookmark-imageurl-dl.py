@@ -76,13 +76,16 @@ for cookie in cookies:
     driver.add_cookie(tmp)
  
 driver.get(URL)
+time.sleep(5)
+driver.execute_script("window.scrollTo(0, 0)")
+time.sleep(2)
 driver.execute_script("window.scrollTo(0, document.body.scrollHeight+1)")
 idx = -1
 
 retry_count = 0
 
 while True:
-    time.sleep(10)
+    time.sleep(5)
     wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_all_elements_located)
     try:
@@ -94,25 +97,23 @@ while True:
         pass
     articles = driver.find_elements(By.CSS_SELECTOR, 'article')
     print("articles count:{}".format(len(articles)))
-    if len(articles) < 3 - idx:
-        print("scroll aricles < 5")
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight+1)")
+    if len(articles) < 7 - idx:
         retry_count = retry_count + 1
+        print("retry_count:{}".format(retry_count))
         if retry_count > 5:
             break
-        print("retry_count:{}".format(retry_count))
-        if retry_count > 2:
+        if len(articles) == 0 or retry_count > 2:
             print("refresh")
             driver.refresh()
             time.sleep(5)
-        time.sleep(5)
+        print("scroll aricles < 7 - {}".format(idx))
+        driver.execute_script("window.scrollTo(0, 0)")
+        time.sleep(2)
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight+1)")
+        time.sleep(3)
         continue;
     else:
         retry_count = 0
-    if len(articles) < 7 - idx:
-        print("scroll aricles < 10")
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight+1)")
-        continue;
     article = articles[idx]
     imgs = article.find_elements(By.CSS_SELECTOR, 'img[src*="/media/"]')
     print("imgs count:{}".format(len(imgs)))
