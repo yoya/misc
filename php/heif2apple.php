@@ -30,7 +30,12 @@ exit (0);
 class HEIF_Filter {
     function heif2apple($in, $out, $boxLen = null) {
         while (is_null($boxLen) || (0 < $boxLen)) {
-            if (! ($tmp = fread($in, 4))) {
+            $tmp = fread($in, 4);
+            if (strlen($tmp) < 4) {
+                if (strlen($tmp) > 0) {
+                    echo "Warning: found tail trash data:len:".strlen($tmp).PHP_EOL;
+                    fwrite($out, $tmp);
+                }
                 return ;
             }
             fwrite($out, $tmp);
@@ -107,10 +112,10 @@ class HEIF_Filter {
                 break;
             default:
                 if ($len === 1) {
-                    while(!feof($in)) {
-                        $data = fread($in, 0x1000000);
-                        fwrite($out, $data);
-                    }
+                    $tmp  = fread($in, 8);
+                    $lenExt = unpack("J", $tmp)[1];
+                    $data = fread($in, $lenExt - 16);
+                    fwrite($out, $data);
                 } else {
                     $data = fread($in, $len - 8);
                     fwrite($out, $data);
