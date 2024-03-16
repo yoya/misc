@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Code Generator</title>
+    <style>
+    </style>
+  </head>
+  <body>
+    <form id="qrcode-settings" >
+      <label for="output_type" >Output</label >
+    <select class="options" id="output_type" name="output_type" >
+    <option value="html" >Markup - HTML</option >
+    <option value="svg"  >Markup - SVG</option >
+    <option value="png" selected="selected" >Image - png</option >
+    <option value="jpg" >Image - jpg</option >
+    <option value="gif" >Image - gif</option >
+    <option value="text" >String - text</option >
+    <option value="json" >String - json</option >
+    </select >
+    <button type="submit" >generate</button >
+    </form>
+    <div id="qrcode-output" ></div >
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prototype/1.7.3/prototype.js" ></script >
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.js" ></script >
+<script >
+        ((form, output, url) => {
+
+                $(form).observe('submit', ev => {
+                        Event.stop(ev);
+
+                        new Ajax.Request(url, {
+                                method: 'post',
+                                parameters: ev.target.serialize(true),
+                                onUninitialized: $(output).update(),
+                                onLoading: $(output).update('[portlandia_screaming.gif]'),
+                                onFailure: response => $(output).update(response.responseJSON.error),
+                                onSuccess: response => $(output).update(response.responseJSON.qrcode),
+                        });
+
+                });
+        })('qrcode-settings', 'qrcode-output', './qrcode.php');
+</script >
+
+</body >
+</html >
+  
