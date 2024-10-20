@@ -173,13 +173,12 @@ function ConvertImageNegate(src, dst) { // negate
     }
 }
 
-function ConvertImageDot(src, dst) { // DeSubpixel
+function ConvertImageDot(src, dst) { // Dot
     var srcData = src.data;
     var dstData = dst.data;
     var n = src.width * src.height * 4; // RGBA 4 byte
     var i = 0;
-    var scanline = new Uint8Array(src.width * 4);
-    var factor = 3.0;
+    var scanline = new Uint8ClampedArray(src.width * 4);
     var factor = 1;
     for (y = 0 ; y < src.height ; y++) {
         var j = 0;
