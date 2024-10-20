@@ -26,7 +26,7 @@
 <option name="BlueTransform"> BlueTransform </option>
 <option name="Negate"> Negate </option>
 <option name="Dot"> Dot </option>
-<option name="DeSubpixel"> DeSubpixel </option>
+<option name="Subpixel"> Subpixel </option>
 </select>
 <div>
   <canvas id="srcCanvas" width="400" height="400"> </canvas>
@@ -73,8 +73,8 @@ var changeFunc = function(e) {
         case "Dot":
           ConvertImage = ConvertImageDot;
           break;
-        case "DeSubpixel":
-          ConvertImage = ConvertImageDeSubpixel;
+        case "Subpixel":
+          ConvertImage = ConvertImageSubpixel;
           break;
     }
     convertFunc();
@@ -213,7 +213,7 @@ function ConvertImageDot(src, dst) { // Dot
        }
     }
 }
-function ConvertImageDeSubpixel(src, dst) { // DeSubpixel
+function ConvertImageSubpixel(src, dst) { // Subpixel
     var srcData = src.data;
     var dstData = dst.data;
     var n = src.width * src.height * 4; // RGBA 4 byte
