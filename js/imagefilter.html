@@ -218,42 +218,35 @@ function ConvertImageSubpixel(src, dst) { // Subpixel
     var dstData = dst.data;
     var n = src.width * src.height * 4; // RGBA 4 byte
     var i = 0;
-    var scanline = new Uint8ClampedArray(src.width * 4);
-    var factor = 2;
+    var factor = 1.5;
+    const scanline = new Uint8ClampedArray(src.width * 4);
     for (y = 0 ; y < src.height ; y++) {
         var j = 0;
         for (x = 0 ; x < src.width ; x++) {
             if ((y % 6) == 0) {
+                const rgb = srcData[i] + srcData[i+1] + srcData[i+2] - 512;
+                const rgb2 = (rgb > 0)? (rgb / 1.5): 0;
                 switch (x % 6) {
                   case 0:
                   case 1:
                     const r = srcData[i]*factor;
-                    const r2 = 255 - r;
                     scanline[j] = r; // R
-                    if (r2 > 0) {
-                        scanline[j+1] = r2/2; // G
-                        scanline[j+2] = r2/2; // B;
-                     }
+                    scanline[j+1] = rgb2; // G
+                    scanline[j+2] = rgb2; // B;
                     break;
                   case 2:
                   case 3:
                     const g = srcData[i+1]*factor;
-                    const g2 = 255 - g;
+                    scanline[j]   = rgb2; // R
                     scanline[j+1] = g; // G
-                    if (g2 > 0) {
-                        scanline[j]   = g/2; // R
-                        scanline[j+2] = g/2; // B
-                    }
+                    scanline[j+2] = rgb2; // B
                     break;
                   case 4:
                   case 5:
                     const b = srcData[i+2]*factor;
-                    const b2 = 255 - b;
+                    scanline[j]   = rgb2; // R
+                    scanline[j+1] = rgb2; // G
                     scanline[j+2] = b; // B
-                    if (b2 > 0) {
-                        scanline[j]   = b2/2; // R
-                        scanline[j+1] = b2/2; // G
-                    }
                     break;
             }
                 scanline[j+3] = srcData[i+3];    // A
