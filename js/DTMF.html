@@ -19,6 +19,9 @@
       td:hover {
           background-color:#fdd;
       }
+      .active {
+          background-color:#ddf;
+      }
     </style>
   </head>
   <h1> DTMF tones </h1>
@@ -26,34 +29,34 @@
     <table>
       <tr>
         <th> [Hz] </th>
-        <th> 1209 </th>
-        <th> 1336 </th>
-        <th> 1477 </th>
-        <th> 1633 </th>
+        <th id="f1209"> 1209 </th>
+        <th id="f1336"> 1336 </th>
+        <th id="f1477"> 1477 </th>
+        <th id="f1633"> 1633 </th>
       </tr>
       <tr>
-        <th> 697 </th>
+        <th id="f697"> 697 </th>
         <td class="toneButton"> 1 </td>
         <td class="toneButton"> 2 </td>
         <td class="toneButton"> 3 </td>
         <td class="toneButton"> A </td>
       </tr>
       <tr>
-        <th> 770 </th>
+        <th id="f770"> 770 </th>
         <td class="toneButton"> 4 </td>
         <td class="toneButton"> 5 </td>
         <td class="toneButton"> 6 </td>
         <td class="toneButton"> B </td>
       </tr>
       <tr>
-        <th> 852 </th>
+        <th id="f852"> 852 </th>
         <td class="toneButton"> 7 </td>
         <td class="toneButton"> 8 </td>
         <td class="toneButton"> 9 </td>
         <td class="toneButton"> C </td>
       </tr>
       <tr>
-        <th> 941 </th>
+        <th id="f941"> 941 </th>
         <td class="toneButton"> * </td>
         <td class="toneButton"> 0 </td>
         <td class="toneButton"> # </td>
@@ -71,11 +74,11 @@
     }
     function startTone() {
         const number = this.innerText
-        const tones = TonesTable[number]
+        const [tone0, tone1] = TonesTable[number]
         const osc0 = new OscillatorNode(
-            audioCtx, { frequency: tones[0], type: "sine"});
+            audioCtx, { frequency: tone0, type: "sine"});
         const osc1 = new OscillatorNode(
-            audioCtx, { frequency: tones[1], type: "sine"});
+            audioCtx, { frequency: tone1, type: "sine"});
         const gain = new GainNode(audioCtx, {gain:0.5});
         osc0.connect(gain).connect(audioCtx.destination);
         osc1.connect(gain).connect(audioCtx.destination);
@@ -83,12 +86,22 @@
         osc1.start();
         this.oscillator0 = osc0
         this.oscillator1 = osc1
+        const tone0element = document.querySelector("#f"+tone0)
+        const tone1element = document.querySelector("#f"+tone1)
+        tone0element.classList.add("active")
+        tone1element.classList.add("active")
+        this.tone0element = tone0element
+        this.tone1element = tone1element
     }
     function stopTone() {
         const osc0 = this.oscillator0;
         const osc1 = this.oscillator1;
         osc0 && osc0.stop();
         osc1 && osc1.stop();
+        const tone0element = this.tone0element
+        const tone1element = this.tone1element
+        tone0element && tone0element.classList.remove("active")
+        tone1element && tone1element.classList.remove("active")
     }
     const buttons = document.querySelectorAll(".toneButton")
     for (button of buttons) {
