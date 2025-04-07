@@ -29,34 +29,34 @@
     <table>
       <tr>
         <th> [Hz] </th>
-        <th id="f1209"> 1209 </th>
-        <th id="f1336"> 1336 </th>
-        <th id="f1477"> 1477 </th>
-        <th id="f1633"> 1633 </th>
+        <th class="freq"> 1209 </th>
+        <th class="freq"> 1336 </th>
+        <th class="freq"> 1477 </th>
+        <th class="freq"> 1633 </th>
       </tr>
       <tr>
-        <th id="f697"> 697 </th>
+        <th class="freq"> 697 </th>
         <td class="toneButton"> 1 </td>
         <td class="toneButton"> 2 </td>
         <td class="toneButton"> 3 </td>
         <td class="toneButton"> A </td>
       </tr>
       <tr>
-        <th id="f770"> 770 </th>
+        <th class="freq"> 770 </th>
         <td class="toneButton"> 4 </td>
         <td class="toneButton"> 5 </td>
         <td class="toneButton"> 6 </td>
         <td class="toneButton"> B </td>
       </tr>
       <tr>
-        <th id="f852"> 852 </th>
+        <th class="freq"> 852 </th>
         <td class="toneButton"> 7 </td>
         <td class="toneButton"> 8 </td>
         <td class="toneButton"> 9 </td>
         <td class="toneButton"> C </td>
       </tr>
       <tr>
-        <th id="f941"> 941 </th>
+        <th class="freq"> 941 </th>
         <td class="toneButton"> * </td>
         <td class="toneButton"> 0 </td>
         <td class="toneButton"> # </td>
@@ -72,6 +72,11 @@
         "7": [852, 1209], "8": [852, 1336], "9": [852, 1477], "C": [852, 1633],
         "*": [941, 1209], "0": [941, 1336], "#": [941, 1477], "D": [941, 1633],
     }
+    const freqTable = {}
+    const freqs = document.querySelectorAll(".freq")
+    for (freq of freqs) {
+        freqTable[freq.innerText] = freq
+    }
     function startTone() {
         const number = this.innerText
         const [tone0, tone1] = TonesTable[number]
@@ -86,12 +91,10 @@
         osc1.start();
         this.oscillator0 = osc0
         this.oscillator1 = osc1
-        const tone0element = document.querySelector("#f"+tone0)
-        const tone1element = document.querySelector("#f"+tone1)
+        const tone0element = freqTable[tone0]
+        const tone1element = freqTable[tone1]
         tone0element.classList.add("active")
         tone1element.classList.add("active")
-        this.tone0element = tone0element
-        this.tone1element = tone1element
     }
     function stopTone() {
         const osc0 = this.oscillator0;
