@@ -1,0 +1,102 @@
+<html>
+  <head>
+    <title> DTMF tones </title>
+    <style>
+      h1 {
+          font-size: 150%;
+      }
+      table {
+          border: 1px black solid
+      }
+      td,th {
+          padding: 8;
+          text-align: center;
+          border: 1px gray dashed
+      }
+      td {
+          background-color:#dfd;
+      }
+      td:hover {
+          background-color:#fdd;
+      }
+    </style>
+  </head>
+  <h1> DTMF tones </h1>
+  <body>
+    <table>
+      <tr>
+        <th> [Hz] </th>
+        <th> 1209 </th>
+        <th> 1336 </th>
+        <th> 1477 </th>
+        <th> 1633 </th>
+      </tr>
+      <tr>
+        <th> 697 </th>
+        <td class="toneButton"> 1 </td>
+        <td class="toneButton"> 2 </td>
+        <td class="toneButton"> 3 </td>
+        <td class="toneButton"> A </td>
+      </tr>
+      <tr>
+        <th> 770 </th>
+        <td class="toneButton"> 4 </td>
+        <td class="toneButton"> 5 </td>
+        <td class="toneButton"> 6 </td>
+        <td class="toneButton"> B </td>
+      </tr>
+      <tr>
+        <th> 852 </th>
+        <td class="toneButton"> 7 </td>
+        <td class="toneButton"> 8 </td>
+        <td class="toneButton"> 9 </td>
+        <td class="toneButton"> C </td>
+      </tr>
+      <tr>
+        <th> 941 </th>
+        <td class="toneButton"> * </td>
+        <td class="toneButton"> 0 </td>
+        <td class="toneButton"> # </td>
+        <td class="toneButton"> D </td>
+      </tr>
+    </table>
+  <script>
+    console.log("DTMF.html")
+    const audioCtx = new AudioContext();
+    const TonesTable = {
+        "1": [697, 1209], "2": [697, 1336], "3": [697, 1477], "A": [697, 1633],
+        "4": [770, 1209], "5": [770, 1336], "6": [770, 1477], "B": [770, 1633],
+        "7": [852, 1209], "8": [852, 1336], "9": [852, 1477], "C": [852, 1633],
+        "*": [941, 1209], "0": [941, 1336], "#": [941, 1477], "D": [941, 1633],
+    }
+    function startTone() {
+        const number = this.innerText
+        const tones = TonesTable[number]
+        const osc0 = new OscillatorNode(
+            audioCtx, { frequency: tones[0], type: "sine"});
+        const osc1 = new OscillatorNode(
+            audioCtx, { frequency: tones[1], type: "sine"});
+        const gain = new GainNode(audioCtx, {gain:0.5});
+        osc0.connect(gain).connect(audioCtx.destination);
+        osc1.connect(gain).connect(audioCtx.destination);
+        osc0.start();
+        osc1.start();
+        this.oscillator0 = osc0
+        this.oscillator1 = osc1
+    }
+    function stopTone() {
+        const osc0 = this.oscillator0;
+        const osc1 = this.oscillator1;
+        osc0 && osc0.stop();
+        osc1 && osc1.stop();
+    }
+    const buttons = document.querySelectorAll(".toneButton")
+    for (button of buttons) {
+        button.addEventListener("pointerdown", startTone);
+        button.addEventListener("pointerup", stopTone);
+        button.addEventListener("pointerleave", stopTone);
+    }
+  </script>
+  </body>
+</html>
+    
