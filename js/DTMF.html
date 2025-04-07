@@ -89,20 +89,20 @@
         osc1.connect(gain).connect(audioCtx.destination);
         osc0.start();
         osc1.start();
-        this.oscillator0 = osc0
-        this.oscillator1 = osc1
+        this.osc0 = osc0
+        this.osc1 = osc1
         const tone0element = freqTable[tone0]
         const tone1element = freqTable[tone1]
         tone0element.classList.add("active")
         tone1element.classList.add("active")
+        this.tone0element = tone0element;
+        this.tone1element = tone1element;
     }
     function stopTone() {
-        const osc0 = this.oscillator0;
-        const osc1 = this.oscillator1;
+        const { osc0, osc1 } = this
+        const { tone0element, tone1element } = this
         osc0 && osc0.stop();
         osc1 && osc1.stop();
-        const tone0element = this.tone0element
-        const tone1element = this.tone1element
         tone0element && tone0element.classList.remove("active")
         tone1element && tone1element.classList.remove("active")
     }
