@@ -26,7 +26,7 @@
 <option name="BlueTransform"> BlueTransform </option>
 <option name="Negate"> Negate </option>
 <option name="Dot"> Dot </option>
-<option name="DeSubpixel"> DeSubpixel </option>
+<option name="Subpixel"> Subpixel </option>
 </select>
 <div>
   <canvas id="srcCanvas" width="400" height="400"> </canvas>
@@ -73,8 +73,8 @@ var changeFunc = function(e) {
         case "Dot":
           ConvertImage = ConvertImageDot;
           break;
-        case "DeSubpixel":
-          ConvertImage = ConvertImageDeSubpixel;
+        case "Subpixel":
+          ConvertImage = ConvertImageSubpixel;
           break;
     }
     convertFunc();
@@ -173,13 +173,12 @@ function ConvertImageNegate(src, dst) { // negate
     }
 }
 
-function ConvertImageDot(src, dst) { // DeSubpixel
+function ConvertImageDot(src, dst) { // Dot
     var srcData = src.data;
     var dstData = dst.data;
     var n = src.width * src.height * 4; // RGBA 4 byte
     var i = 0;
-    var scanline = new Uint8Array(src.width * 4);
-    var factor = 3.0;
+    var scanline = new Uint8ClampedArray(src.width * 4);
     var factor = 1;
     for (y = 0 ; y < src.height ; y++) {
         var j = 0;
@@ -214,38 +213,42 @@ function ConvertImageDot(src, dst) { // DeSubpixel
        }
     }
 }
-function ConvertImageDeSubpixel(src, dst) { // DeSubpixel
+function ConvertImageSubpixel(src, dst) { // Subpixel
     var srcData = src.data;
     var dstData = dst.data;
     var n = src.width * src.height * 4; // RGBA 4 byte
     var i = 0;
-    var scanline = new Uint8Array(src.width * 4);
-    var factor = 3.0;
-    var factor = 1;
+    var factor = 1.5;
+    const scanline = new Uint8ClampedArray(src.width * 4);
     for (y = 0 ; y < src.height ; y++) {
         var j = 0;
         for (x = 0 ; x < src.width ; x++) {
             if ((y % 6) == 0) {
+                const rgb = srcData[i] + srcData[i+1] + srcData[i+2] - 512;
+                const rgb2 = (rgb > 0)? (rgb / 1.5): 0;
                 switch (x % 6) {
                   case 0:
                   case 1:
-                    scanline[j]   = srcData[i]*factor; // R
-                    scanline[j+1] = 0; // G
-                    scanline[j+2] = 0; // B;
+                    const r = srcData[i]*factor;
+                    scanline[j] = r; // R
+                    scanline[j+1] = rgb2; // G
+                    scanline[j+2] = rgb2; // B;
                     break;
                   case 2:
                   case 3:
-                    scanline[j]   = 0; // R
-                    scanline[j+1] = srcData[i+1]*factor; // G
-                    scanline[j+2] = 0;// B
+                    const g = srcData[i+1]*factor;
+                    scanline[j]   = rgb2; // R
+                    scanline[j+1] = g; // G
+                    scanline[j+2] = rgb2; // B
                     break;
                   case 4:
                   case 5:
-                    scanline[j]   = 0; // R
-                    scanline[j+1] = 0; // G
-                    scanline[j+2] = srcData[i+2]*factor; // B
+                    const b = srcData[i+2]*factor;
+                    scanline[j]   = rgb2; // R
+                    scanline[j+1] = rgb2; // G
+                    scanline[j+2] = b; // B
                     break;
-                }
+            }
                 scanline[j+3] = srcData[i+3];    // A
             } else {
                 dstData[i]   = scanline[j];
