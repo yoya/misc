@@ -1,0 +1,4 @@
+- python setup.py でモジュールが入ります
+- python wx_fixcrlf.py で Exit ボタンだけあるアプリが表示されます
+- そのアプリにファイルを drop すると、改行コードがプラットフォームのものに統一されます。
+- Windows なら CRLF、UNIX/macOS なら LF
