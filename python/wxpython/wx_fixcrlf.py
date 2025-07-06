@@ -17,7 +17,7 @@ class MyFileDropTarget(wx.FileDropTarget):
             encoding = detectEncoding(filename)
             print("({}){}".format(encoding, filename))
             if encoding in ["ascii", "utf-8", "sjis"]:
-                convertToCRLF(filename, encoding)
+                convertCRLF(filename, encoding)
         return True
 
 def detectEncoding(filename):
@@ -38,8 +38,8 @@ def detectEncoding(filename):
         return "sjis"
     return "binary"
 
-def convertToCRLF(filename, encoding):
-    print("convertToCRLF", filename)
+def convertCRLF(filename, encoding):
+    print("convertCRLF", filename)
     with open(filename, 'tr', encoding=encoding) as r:
         line = r.read()
         r.close()
