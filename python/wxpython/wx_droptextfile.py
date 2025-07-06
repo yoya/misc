@@ -1,5 +1,4 @@
 import wx
-from chardet import detect
 
 class MyFrame(wx.Frame):
     def __init__(self):
